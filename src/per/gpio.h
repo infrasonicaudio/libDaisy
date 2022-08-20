@@ -100,11 +100,13 @@ class GPIO
      *  @param m Mode specifying the behavior of the GPIO (input, output, etc.). Defaults to Mode::INPUT
      *  @param pu Pull up/down state for the GPIO. Defaults to Pull::NOPULL
      *  @param sp Speed setting for drive strength/slew rate. Defaults to Speed::Slow
+     *  @param cb Callback for interrupt pin modes. Defaults to nullptr.
     */
-    void Init(Pin   p,
-              Mode  m  = Mode::INPUT,
-              Pull  pu = Pull::NOPULL,
-              Speed sp = Speed::LOW);
+    void Init(Pin               p,
+              Mode              m  = Mode::INPUT,
+              Pull              pu = Pull::NOPULL,
+              Speed             sp = Speed::LOW,
+              InterruptCallback cb = nullptr);
 
     /** @brief Deinitializes the GPIO pin */
     void DeInit();
