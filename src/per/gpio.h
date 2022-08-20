@@ -21,19 +21,18 @@ namespace daisy
 class GPIO
 {
   public:
-
     typedef void (*InterruptCallback)(Pin pin);
 
     /** @brief Mode of operation for the specified GPIO */
     enum class Mode
     {
-        INPUT,              /**< Input for reading state of pin */
-        OUTPUT,             /**< Output w/ push-pull configuration */
-        OUTPUT_OD,          /**< Output w/ open-drain configuration */
-        ANALOG,             /**< Analog for connection to ADC or DAC peripheral */
-        INTERRUPT_RISING,   /**< External interrupt on rising edges */
-        INTERRUPT_FALLING,  /**< External interrupt on falling edges */
-        INTERRUPT_BOTH      /**< External interrupt on both rising and falling edges */
+        INPUT,            /**< Input for reading state of pin */
+        OUTPUT,           /**< Output w/ push-pull configuration */
+        OUTPUT_OD,        /**< Output w/ open-drain configuration */
+        ANALOG,           /**< Analog for connection to ADC or DAC peripheral */
+        INTERRUPT_RISING, /**< External interrupt on rising edges */
+        INTERRUPT_FALLING, /**< External interrupt on falling edges */
+        INTERRUPT_BOTH /**< External interrupt on both rising and falling edges */
     };
 
     /** @brief Configures whether an internal Pull up or Pull down resistor is used. 
@@ -73,7 +72,11 @@ class GPIO
          *  an input, with no pullup. 
          */
         Config()
-        : pin(), mode(Mode::INPUT), pull(Pull::NOPULL), speed(Speed::LOW), callback(nullptr)
+        : pin(),
+          mode(Mode::INPUT),
+          pull(Pull::NOPULL),
+          speed(Speed::LOW),
+          callback(nullptr)
         {
         }
     };
