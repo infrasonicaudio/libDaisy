@@ -162,13 +162,14 @@ void GPIO::Init(Pin p, const Config &cfg)
     cfg_.pin = p;
     Init(cfg_);
 }
-void GPIO::Init(Pin p, Mode m, Pull pu, Speed sp)
+void GPIO::Init(Pin p, Mode m, Pull pu, Speed sp, InterruptCallback cb)
 {
     // Populate Config struct, and init with overload
-    cfg_.pin   = p;
-    cfg_.mode  = m;
-    cfg_.pull  = pu;
-    cfg_.speed = sp;
+    cfg_.pin      = p;
+    cfg_.mode     = m;
+    cfg_.pull     = pu;
+    cfg_.speed    = sp;
+    cfg_.callback = cb;
     Init(cfg_);
 }
 
