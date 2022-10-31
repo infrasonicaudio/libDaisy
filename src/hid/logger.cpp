@@ -120,8 +120,10 @@ void Logger<dest>::AppendNewLine()
 template class Logger<LOGGER_INTERNAL>;
 template class Logger<LOGGER_EXTERNAL>;
 template class Logger<LOGGER_SEMIHOST>;
+template class Logger<LOGGER_USART_1>;
 
 /** LoggerImpl static member variables */
-UsbHandle LoggerImpl<LOGGER_INTERNAL>::usb_handle_;
-UsbHandle LoggerImpl<LOGGER_EXTERNAL>::usb_handle_;
+UsbHandle   LoggerImpl<LOGGER_INTERNAL>::usb_handle_;
+UsbHandle   LoggerImpl<LOGGER_EXTERNAL>::usb_handle_;
+UartHandler LoggerImpl<LOGGER_USART_1>::uart_handle_;
 } // namespace daisy

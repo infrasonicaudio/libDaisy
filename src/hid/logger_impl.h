@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <cassert>
 #include "hid/usb.h"
+#include "per/uart.h"
 #include "sys/system.h"
 
 
@@ -17,6 +18,7 @@ enum LoggerDestination
     LOGGER_INTERNAL, /**< internal USB port */
     LOGGER_EXTERNAL, /**< external USB port */
     LOGGER_SEMIHOST, /**< stdout */
+    LOGGER_USART_1,  /**< TTL serial over USART_1 */
 };
 
 /** @brief Logging I/O underlying implementation
@@ -120,6 +122,35 @@ class LoggerImpl<LOGGER_SEMIHOST>
     }
 };
 
+template<>
+class LoggerImpl<LOGGER_USART_1>
+{
+  public:
+    /** Initialize logging destination
+     */
+    static void Init()
+    {
+        UartHandler::Config config;
+        config.periph        = UartHandler::Config::Peripheral::USART_1;
+        config.mode          = UartHandler::Config::Mode::TX;
+        config.pin_config.tx = Pin(PORTB, 6);
+        config.pin_config.rx = Pin(PORTX, 0);
+        config.baudrate      = 115200;
+        uart_handle_.Init(config);
+    }
+
+    /** Transmit a block of data
+     */
+    static bool Transmit(const void* buffer, size_t bytes)
+    {
+        return UartHandler::Result::OK
+               == uart_handle_.BlockingTransmit((uint8_t*)buffer, bytes);
+    }
+
+  protected:
+    /** UART handle for transfers */
+    static UartHandler uart_handle_;
+};
 
 } /* namespace daisy */
 
