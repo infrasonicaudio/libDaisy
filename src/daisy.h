@@ -53,6 +53,7 @@
 #include "dev/neopixel.h"
 #include "dev/neotrellis.h"
 #include "dev/icm20948.h"
+#include "dev/tlc59281.h"
 #include "ui/ButtonMonitor.h"
 #include "ui/PotMonitor.h"
 #include "ui/UI.h"
