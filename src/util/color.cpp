@@ -9,34 +9,30 @@ using namespace daisy;
 
 namespace daisy
 {
-    template <typename T>
-    T clamp(T in, T low, T high)
-    {
-        return (in < low) ? low : (high < in) ? high : in;
-    }
+template <typename T>
+T clamp(T in, T low, T high)
+{
+    return (in < low) ? low : (high < in) ? high : in;
+}
+} // namespace daisy
+
+Color::Color() : red_(1.0f), green_(1.0f), blue_(1.0f) {}
+
+Color::Color(float red, float green, float blue)
+: red_(clamp(red, 0.0f, 1.0f)),
+  green_(clamp(green, 0.0f, 1.0f)),
+  blue_(clamp(blue, 0.0f, 1.0f))
+{
 }
 
-const float Color::standard_colors[Color::LAST][3] = {
-    {1.0f, 0.0f, 0.0f},   // RED
-    {0.0f, 1.0f, 0.0f},   // GREEN
-    {0.0f, 0.0f, 1.0f},   // BLUE
-    {1.0f, 1.0f, 1.0f},   // WHITE
-    {0.25f, 0.0f, 1.0f},  // PURPLE
-    {0.0f, 0.25f, 0.75f}, // CYAN
-    {1.0f, 0.33f, 0.0f},  // GOLD
-    {0.0f, 0.0f, 0.0f},   // OFF
-};
-
-void Color::Init(PresetColor c)
+Color::Color(uint8_t red, uint8_t green, uint8_t blue)
+: red_(red / 255.0f), green_(green / 255.0f), blue_(blue / 255.0f)
 {
-    red_   = standard_colors[c][RED];
-    green_ = standard_colors[c][GREEN];
-    blue_  = standard_colors[c][BLUE];
 }
 
-void Color::Init(float red, float green, float blue)
+Color::Color(uint32_t hex)
+: Color(uint8_t((hex >> 16) & 0x00FF),
+        uint8_t((hex >> 8) & 0x00FF),
+        uint8_t(hex & 0x00FF))
 {
-    red_   = clamp(red, 0.0f, 1.0f);
-    green_ = clamp(red, 0.0f, 1.0f);
-    blue_  = clamp(blue, 0.0f, 1.0f);
 }

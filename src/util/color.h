@@ -1,4 +1,4 @@
-/* 
+/*
 TODO:
 - Add Blend(), Scale(), etc.
 - I'd also like to change the way the Color names are accessed.
@@ -23,35 +23,11 @@ namespace daisy
 class Color
 {
   public:
-    Color() {}
-    ~Color() {}
-
-    /** List of colors that have a preset RGB value */
-    enum PresetColor
-    {
-        RED,    /**< & */
-        GREEN,  /**< & */
-        BLUE,   /**< & */
-        WHITE,  /**< & */
-        PURPLE, /**< & */
-        CYAN,   /**< & */
-        GOLD,   /**< & */
-        OFF,    /**< & */
-        LAST    /**< & */
-    };
-
-    /** Initializes the Color with a given preset. 
-    \param c Color to init to
-    */
-    void Init(PresetColor c);
-
-    /** Initializes the Color with a specific RGB value
-    red, green, and blue should be floats between 0 and 1
-    \param red Red value
-    \param green Green value
-    \param blue Blue value
-    */
-    void Init(float red, float green, float blue);
+    Color();
+    ~Color() = default;
+    Color(float red, float green, float blue);
+    Color(uint8_t red, uint8_t green, uint8_t blue);
+    Color(uint32_t hex);
 
     /** Returns the 0-1 value for Red */
     inline float Red() const { return red_; }
@@ -66,16 +42,22 @@ class Color
     inline uint8_t Green8() const { return green_ * 255; }
     inline uint8_t Blue8() const { return blue_ * 255; }
 
-    /** Returns a scaled color by a float */
-    Color operator*(float scale)
+    inline uint32_t Hex() const
     {
-        Color c;
-        c.Init(red_ * scale, green_ * scale, blue_ * scale);
-        return c;
+      uint32_t hex = 0;
+      hex |= Red8() << 16;
+      hex |= Green8() << 8;
+      hex |= Blue8();
+      return hex;
+    }
+
+    /** Returns a scaled color by a float */
+    Color operator*(const float scale) const
+    {
+        return Color(red_ * scale, green_ * scale, blue_ * scale);
     }
 
   private:
-    static const float standard_colors[LAST][3];
     float              red_, green_, blue_;
 };
 /** @} */

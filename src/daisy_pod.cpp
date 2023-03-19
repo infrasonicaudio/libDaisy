@@ -185,13 +185,13 @@ void DaisyPod::ProcessDigitalControls()
 void DaisyPod::ClearLeds()
 {
     // Using Color
-    Color c;
-    c.Init(Color::PresetColor::OFF);
-    led1.SetColor(c);
-    led2.SetColor(c);
+    // Color c;
+    // c.Init(Color::PresetColor::OFF);
+    // led1.SetColor(c);
+    // led2.SetColor(c);
     // Without
-    // led1.Set(0.0f, 0.0f, 0.0f);
-    // led2.Set(0.0f, 0.0f, 0.0f);
+    led1.Set(0.0f, 0.0f, 0.0f);
+    led2.Set(0.0f, 0.0f, 0.0f);
 }
 
 void DaisyPod::UpdateLeds()
