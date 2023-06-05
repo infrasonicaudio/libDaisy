@@ -17,7 +17,7 @@ namespace patch_sm
     static constexpr dsy_gpio_pin PIN_ADC_CTRL_8  = {DSY_GPIOC, 1};
     static constexpr dsy_gpio_pin PIN_ADC_CTRL_9  = {DSY_GPIOA, 1};
     static constexpr dsy_gpio_pin PIN_ADC_CTRL_10 = {DSY_GPIOA, 0};
-    static constexpr dsy_gpio_pin PIN_ADC_CTRL_11 = {DSY_GPIOC, 3};
+    // static constexpr dsy_gpio_pin PIN_ADC_CTRL_11 = {DSY_GPIOC, 3};
     static constexpr dsy_gpio_pin PIN_ADC_CTRL_12 = {DSY_GPIOC, 2};
     static constexpr dsy_gpio_pin PIN_USER_LED    = {DSY_GPIOC, 7};
 
@@ -302,13 +302,21 @@ namespace patch_sm
             PIN_ADC_CTRL_6,
             PIN_ADC_CTRL_9,
             PIN_ADC_CTRL_10,
-            PIN_ADC_CTRL_11,
+            // PIN_ADC_CTRL_11,
             PIN_ADC_CTRL_12,
         };
 
         for(int i = 0; i < ADC_LAST; i++)
         {
-            adc_config[i].InitSingle(adc_pins[i]);
+            // Warp Core uses ADC multiplexed for the expander
+            if (i == ADC_9)
+            {
+                adc_config[i].InitMux(adc_pins[i], 4, B7, B8);
+            }
+            else
+            {
+                adc_config[i].InitSingle(adc_pins[i]);
+            }
         }
         adc.Init(adc_config, ADC_LAST);
         /** Control Init */
