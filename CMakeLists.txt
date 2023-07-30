@@ -45,6 +45,8 @@ add_library(${TARGET} STATIC
     ${MODULE_DIR}/hid/gatein.cpp
     ${MODULE_DIR}/hid/led.cpp
     ${MODULE_DIR}/hid/logger_impl.cpp
+    ${MODULE_DIR}/hid/midi.cpp
+    ${MODULE_DIR}/hid/midi_parser.cpp
     ${MODULE_DIR}/hid/parameter.cpp
     ${MODULE_DIR}/hid/rgb_led.cpp
     ${MODULE_DIR}/hid/switch.cpp
