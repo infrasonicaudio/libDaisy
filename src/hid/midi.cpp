@@ -2,17 +2,17 @@
 
 namespace daisy
 {
-static constexpr size_t kDefaultMidiRxBufferSize = 256;
+static constexpr size_t kDefaultMidiRxBufferCapacity = 256;
 
 static uint8_t DMA_BUFFER_MEM_SECTION
-    default_midi_rx_buffer[kDefaultMidiRxBufferSize];
+    default_midi_rx_buffer[kDefaultMidiRxBufferCapacity];
 
 MidiUartTransport::Config::Config()
 {
-    periph         = UartHandler::Config::Peripheral::USART_1;
-    rx             = {DSY_GPIOB, 7};
-    tx             = {DSY_GPIOB, 6};
-    rx_buffer      = default_midi_rx_buffer;
-    rx_buffer_size = kDefaultMidiRxBufferSize;
+    periph             = UartHandler::Config::Peripheral::USART_1;
+    rx                 = {DSY_GPIOB, 7};
+    tx                 = {DSY_GPIOB, 6};
+    rx_buffer          = default_midi_rx_buffer;
+    rx_buffer_capacity = kDefaultMidiRxBufferCapacity;
 }
 } // namespace daisy

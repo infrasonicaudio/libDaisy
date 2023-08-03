@@ -44,6 +44,7 @@ hid/led \
 hid/logger_impl \
 hid/midi \
 hid/midi_parser \
+hid/midi_util \
 hid/parameter \
 hid/rgb_led \
 hid/switch \

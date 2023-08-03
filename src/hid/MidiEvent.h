@@ -1,3 +1,7 @@
+#pragma once
+
+#include <stdint.h>
+
 // TODO: make this adjustable
 #define SYSEX_BUFFER_LEN 128
 
