@@ -141,6 +141,8 @@ struct dsy_adc
     // channel data
     uint8_t  channels, mux_channels[DSY_ADC_MAX_CHANNELS];
     uint16_t mux_index[DSY_ADC_MAX_CHANNELS]; // 0->mux_channels per ADC channel
+    bool     overread_enabled[DSY_ADC_MAX_CHANNELS];
+    bool     overread_active[DSY_ADC_MAX_CHANNELS];
     // dma buffer ptrs
     uint16_t* dma_buffer;
     uint16_t (*mux_cache)[DSY_ADC_MAX_MUX_CHANNELS];
@@ -162,7 +164,7 @@ static int get_num_mux_pins_required(int num_mux_ch)
         return 0;
 }
 static void
-                      write_mux_value(uint8_t chn, uint8_t idx, uint8_t num_mux_pins_to_write);
+write_mux_value(uint8_t chn, uint8_t idx, uint8_t num_mux_pins_to_write);
 static const uint32_t adc_channel_from_pin(dsy_gpio_pin* pin);
 
 static const uint32_t adc_channel_from_pin(dsy_gpio_pin* pin)
@@ -213,6 +215,7 @@ void AdcChannelConfig::InitMux(dsy_gpio_pin                      adc_pin,
                                dsy_gpio_pin                      mux_0,
                                dsy_gpio_pin                      mux_1,
                                dsy_gpio_pin                      mux_2,
+                               bool                              overread,
                                AdcChannelConfig::ConversionSpeed speed)
 {
     size_t pins_to_init;
@@ -225,6 +228,7 @@ void AdcChannelConfig::InitMux(dsy_gpio_pin                      adc_pin,
     mux_pin_[1].pin = mux_1;
     mux_pin_[2].pin = mux_2;
     mux_channels_   = mux_channels < 8 ? mux_channels : 8;
+    mux_overread_   = overread;
     pins_to_init    = get_num_mux_pins_required(mux_channels_);
     for(size_t i = 0; i < pins_to_init; i++)
     {
@@ -251,9 +255,11 @@ void AdcHandle::Init(AdcChannelConfig* cfg,
     // Clear Buffers
     for(size_t i = 0; i < DSY_ADC_MAX_CHANNELS; i++)
     {
-        adc.dma_buffer[i]   = 0;
-        adc.mux_channels[i] = 0; // set to 0 mux first.
-        adc.mux_index[i]    = 0;
+        adc.dma_buffer[i]      = 0;
+        adc.mux_channels[i]    = 0; // set to 0 mux first.
+        adc.mux_index[i]       = 0;
+        adc.overread_active[i] = false;
+        adc.overread_enabled[i] = false;
     }
     // Set Config Pointer and data for use in MspInit
     adc.channels = num_channels;
@@ -265,7 +271,10 @@ void AdcHandle::Init(AdcChannelConfig* cfg,
         adc.dma_buffer[i]   = 0;
         adc.mux_channels[i] = cfg[i].mux_channels_;
         if(cfg[i].mux_channels_ > 0)
+        {
             adc.mux_used = true;
+            adc.overread_enabled[i] = cfg[i].mux_overread_;
+        }
     }
     adc.hadc1.Instance                  = ADC1;
     adc.hadc1.Init.ClockPrescaler       = ADC_CLOCK_ASYNC_DIV2;
@@ -530,13 +539,36 @@ static void adc_internal_callback()
         {
             // Capture current value to mux_cache
             const auto value                   = adc.dma_buffer[i];
-            adc.mux_cache[i][current_position] = value;
             // Update Mux Position, and write GPIO
-            adc.mux_index[chn] += 1;
-            if(adc.mux_index[chn] >= adc.mux_channels[chn])
-                adc.mux_index[chn] = 0;
-            write_mux_value(
-                chn, adc.mux_index[chn], adc.num_mux_pins_required[chn]);
+            if (!adc.overread_enabled[chn] || adc.overread_active[chn])
+            {
+                if (adc.overread_active[chn])
+                {
+                    adc.overread_active[chn] = false;
+                    adc.mux_cache[i][0] = value;
+                    adc.mux_index[chn] += 1;
+                    if(adc.mux_index[chn] >= adc.mux_channels[chn])
+                        adc.mux_index[chn] = 0;
+                    write_mux_value(
+                        chn, adc.mux_index[chn], adc.num_mux_pins_required[chn]);
+                }
+                else
+                {
+                    adc.mux_cache[i][current_position] = value;
+                    adc.overread_active[chn] = true;
+                    write_mux_value(
+                        chn, 0, adc.num_mux_pins_required[chn]);
+                }
+            }
+            else
+            {
+                adc.mux_cache[i][current_position] = value;
+                adc.mux_index[chn] += 1;
+                if(adc.mux_index[chn] >= adc.mux_channels[chn])
+                    adc.mux_index[chn] = 0;
+                write_mux_value(
+                    chn, adc.mux_index[chn], adc.num_mux_pins_required[chn]);
+            }
         }
     }
     // Restart DMA
@@ -576,7 +608,10 @@ void HAL_ADC_MspDeInit(ADC_HandleTypeDef* adcHandle)
 
 extern "C"
 {
-    void DMA1_Stream2_IRQHandler(void) { HAL_DMA_IRQHandler(&adc.hdma_adc1); }
+    void DMA1_Stream2_IRQHandler(void)
+    {
+        HAL_DMA_IRQHandler(&adc.hdma_adc1);
+    }
 
     void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
     {

@@ -309,13 +309,20 @@ namespace patch_sm
         for(int i = 0; i < ADC_LAST; i++)
         {
             // Warp Core uses ADC multiplexed for the expander
-            if (i == ADC_9)
+            if(i == ADC_9)
             {
-                adc_config[i].InitMux(adc_pins[i], 4, B7, B8, DUMMYPIN, AdcChannelConfig::SPEED_2CYCLES_5);
+                adc_config[i].InitMux(adc_pins[i],
+                                      4,
+                                      B7,
+                                      B8,
+                                      DUMMYPIN,
+                                      true,
+                                      AdcChannelConfig::SPEED_2CYCLES_5);
             }
             else
             {
-                adc_config[i].InitSingle(adc_pins[i], AdcChannelConfig::SPEED_2CYCLES_5);
+                adc_config[i].InitSingle(adc_pins[i],
+                                         AdcChannelConfig::SPEED_2CYCLES_5);
             }
         }
         adc.Init(adc_config, ADC_LAST, AdcHandle::OVS_8);
@@ -376,7 +383,10 @@ namespace patch_sm
         audio.ChangeCallback(cb);
     }
 
-    void DaisyPatchSM::StopAudio() { audio.Stop(); }
+    void DaisyPatchSM::StopAudio()
+    {
+        audio.Stop();
+    }
 
     void DaisyPatchSM::SetAudioBlockSize(size_t size)
     {
@@ -432,13 +442,25 @@ namespace patch_sm
         return audio.GetConfig().blocksize;
     }
 
-    float DaisyPatchSM::AudioSampleRate() { return audio.GetSampleRate(); }
+    float DaisyPatchSM::AudioSampleRate()
+    {
+        return audio.GetSampleRate();
+    }
 
-    float DaisyPatchSM::AudioCallbackRate() { return callback_rate_; }
+    float DaisyPatchSM::AudioCallbackRate()
+    {
+        return callback_rate_;
+    }
 
-    void DaisyPatchSM::StartAdc() { adc.Start(); }
+    void DaisyPatchSM::StartAdc()
+    {
+        adc.Start();
+    }
 
-    void DaisyPatchSM::StopAdc() { adc.Stop(); }
+    void DaisyPatchSM::StopAdc()
+    {
+        adc.Stop();
+    }
 
     void DaisyPatchSM::ProcessAnalogControls()
     {
@@ -450,7 +472,10 @@ namespace patch_sm
 
     void DaisyPatchSM::ProcessDigitalControls() {}
 
-    float DaisyPatchSM::GetAdcValue(int idx) { return controls[idx].Value(); }
+    float DaisyPatchSM::GetAdcValue(int idx)
+    {
+        return controls[idx].Value();
+    }
 
     dsy_gpio_pin DaisyPatchSM::GetPin(const PinBank bank, const int idx)
     {
@@ -465,14 +490,20 @@ namespace patch_sm
         pimpl_->StartDac(callback);
     }
 
-    void DaisyPatchSM::StopDac() { pimpl_->StopDac(); }
+    void DaisyPatchSM::StopDac()
+    {
+        pimpl_->StopDac();
+    }
 
     void DaisyPatchSM::WriteCvOut(const int channel, float voltage)
     {
         pimpl_->WriteCvOut(channel, voltage);
     }
 
-    void DaisyPatchSM::SetLed(bool state) { dsy_gpio_write(&user_led, state); }
+    void DaisyPatchSM::SetLed(bool state)
+    {
+        dsy_gpio_write(&user_led, state);
+    }
 
     bool DaisyPatchSM::ValidateSDRAM()
     {
