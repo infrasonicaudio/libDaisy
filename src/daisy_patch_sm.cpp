@@ -311,14 +311,14 @@ namespace patch_sm
             // Warp Core uses ADC multiplexed for the expander
             if (i == ADC_9)
             {
-                adc_config[i].InitMux(adc_pins[i], 4, B7, B8);
+                adc_config[i].InitMux(adc_pins[i], 4, B7, B8, DUMMYPIN, AdcChannelConfig::SPEED_2CYCLES_5);
             }
             else
             {
-                adc_config[i].InitSingle(adc_pins[i]);
+                adc_config[i].InitSingle(adc_pins[i], AdcChannelConfig::SPEED_2CYCLES_5);
             }
         }
-        adc.Init(adc_config, ADC_LAST);
+        adc.Init(adc_config, ADC_LAST, AdcHandle::OVS_8);
         /** Control Init */
         for(size_t i = 0; i < ADC_LAST; i++)
         {
