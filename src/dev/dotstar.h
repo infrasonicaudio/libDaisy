@@ -123,15 +123,9 @@ class DotStar
 
     /**
      * \brief Set global brightness for all pixels
-<<<<<<< HEAD
-     * \details "Global brighntess" for the APA120 device sets the
-     *          equivalent constant current for the LEDs, not a pre-multiplied PWM
-     *          brightness scaling for the pixel's RGB value. See APA102 datasheet
-=======
      * \details "Global brightness" for the SK9822 device sets the
      *          equivalent constant current for the LEDs, not a pre-multiplied PWM
      *          brightness scaling for the pixel's RGB value. See SK9822 datasheet
->>>>>>> origin/master
      *          for details.
      * \warning Recommend not going above 10, especially for SK9822-EC20 which may
      *          overheat if you do.
@@ -163,6 +157,7 @@ class DotStar
         {
             return Result::ERR_INVALID_ARGUMENT;
         }
+        b_global_ = b;
         uint8_t *pixel = (uint8_t *)(&pixels_[idx]);
         pixel[0]       = 0xE0 | std::min(b, (uint16_t)31);
         return Result::OK;
@@ -266,8 +261,12 @@ class DotStar
      *         Does not reset global brightnesses.
      *         Does not write pixel buffer data to LEDs.
      */
-    void Clear()
+    void Clear(bool reset_brightness = true)
     {
+        if (reset_brightness)
+        {
+            SetAllGlobalBrightness(b_global_);
+        }
         for(uint16_t i = 0; i < num_pixels_; i++)
         {
             SetPixelColor(i, 0);
@@ -303,6 +302,7 @@ class DotStar
     uint16_t            num_pixels_;
     uint32_t            pixels_[kMaxNumPixels];
     uint8_t             r_offset_, g_offset_, b_offset_;
+    uint16_t            b_global_;
 };
 
 using DotStarSpi = DotStar<DotStarSpiTransport>;
