@@ -540,7 +540,7 @@ static void adc_internal_callback()
             // Capture current value to mux_cache
             const auto value                   = adc.dma_buffer[i];
             // Update Mux Position, and write GPIO
-            if (!adc.overread_enabled[chn] || adc.overread_active[chn])
+            if (adc.overread_enabled[chn])
             {
                 if (adc.overread_active[chn])
                 {
