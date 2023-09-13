@@ -85,14 +85,13 @@ class PersistentStorage
         }
         else
         {
-            if (storage_data->version != Version)
-            {
-                // TODO: Migrate settings
-                asm("bkpt 255");
-            }
-
             state_    = cur_state;
             settings_ = storage_data->user_data;
+            if (storage_data->version != Version)
+            {
+                settings_.Migrate(storage_data->version, Version);
+                StoreSettingsIfChanged(true);
+            }
         }
     }
 
