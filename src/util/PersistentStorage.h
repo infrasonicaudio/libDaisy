@@ -88,11 +88,14 @@ class PersistentStorage
             if (storage_data->version != Version)
             {
                 // TODO: Migrate settings
-                asm("bkpt 255");
+                // asm("bkpt 255");
+                RestoreDefaults();
             }
-
-            state_    = cur_state;
-            settings_ = storage_data->user_data;
+            else
+            {
+                state_    = cur_state;
+                settings_ = storage_data->user_data;
+            }
         }
     }
 
