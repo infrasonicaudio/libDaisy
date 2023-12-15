@@ -331,7 +331,8 @@ CFLAGS += \
 CPPFLAGS = $(CFLAGS) $(CPP_WARNINGS)
 CPPFLAGS += \
 -fno-exceptions \
--fno-rtti
+-fno-rtti \
+-funroll-loops
 
 C_STANDARD = -std=gnu11
 CPP_STANDARD += -std=gnu++14
