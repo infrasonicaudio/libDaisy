@@ -17,7 +17,7 @@ namespace daisy
  *  \todo - Add wear leveling
  *
  **/
-template <typename SettingStruct, const char* Slug, uint32_t Version>
+template <typename SettingStruct, const char *Slug, uint32_t CurrentVersion>
 class PersistentStorage
 {
   public:
@@ -62,7 +62,9 @@ class PersistentStorage
      *  \param address_offset offset for location on the QSPI chip (offset to base address of device).
      *      This defaults to the first address on the chip, and will be masked to the nearest multiple of 256
      **/
-    void Init(const QSPIHandle& qspi, const SettingStruct &defaults, uint32_t address_offset = 0)
+    void Init(const QSPIHandle    &qspi,
+              const SettingStruct &defaults,
+              uint32_t             address_offset = 0)
     {
         qspi_             = qspi;
         default_settings_ = defaults;
@@ -75,27 +77,36 @@ class PersistentStorage
         const bool invalid_slug = strcmp(storage_data->slug, Slug) != 0;
 
         // check to see if the state is already in use.
-        State cur_state = storage_data->storage_state;
-        const bool data_empty = (cur_state != State::FACTORY && cur_state != State::USER);
+        State      cur_state = storage_data->storage_state;
+        const bool data_empty
+            = (cur_state != State::FACTORY && cur_state != State::USER);
 
         if(invalid_slug || data_empty)
         {
             // Initialize the Data store State::FACTORY, and the DefaultSettings
             RestoreDefaults();
+            return;
+        }
+        if(storage_data->version != CurrentVersion)
+        {
+            uint32_t old_version = storage_data->version;
+            // MUST BE VALUE COPY, NOT REF -
+            // memory needs to live in stack not flash space
+            auto settings = storage_data->user_data;
+            if(!settings.Migrate(old_version, CurrentVersion))
+            {
+                RestoreDefaults();
+                return;
+            }
+
+            state_    = cur_state;
+            settings_ = settings;
+            StoreSettingsIfChanged(true);
         }
         else
         {
-            if (storage_data->version != Version)
-            {
-                // TODO: Migrate settings
-                // asm("bkpt 255");
-                RestoreDefaults();
-            }
-            else
-            {
-                state_    = cur_state;
-                settings_ = storage_data->user_data;
-            }
+            state_    = cur_state;
+            settings_ = storage_data->user_data;
         }
     }
 
@@ -112,7 +123,7 @@ class PersistentStorage
         StoreSettingsIfChanged();
     }
 
-    void Save(const SettingStruct& settings)
+    void Save(const SettingStruct &settings)
     {
         settings_ = settings;
         Save();
@@ -129,7 +140,8 @@ class PersistentStorage
   private:
     static constexpr size_t kMaxSlugLen = 32;
 
-    static_assert(strlen(Slug) < kMaxSlugLen - 1, "Slug for PersistentStorage too long");
+    static_assert(strlen(Slug) < kMaxSlugLen - 1,
+                  "Slug for PersistentStorage too long");
 
     struct SaveStruct
     {
@@ -144,7 +156,7 @@ class PersistentStorage
         SaveStruct s;
         strcpy(s.slug, Slug);
         s.storage_state = state_;
-        s.version       = Version;
+        s.version       = CurrentVersion;
         s.user_data     = settings_;
 
         void *data_ptr = qspi_.GetData(address_offset_);
