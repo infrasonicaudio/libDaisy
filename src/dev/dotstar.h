@@ -138,6 +138,7 @@ class DotStar
         {
             SetPixelGlobalBrightness(i, b);
         }
+        b_global_ = b;
     };
 
     /**
@@ -157,7 +158,6 @@ class DotStar
         {
             return Result::ERR_INVALID_ARGUMENT;
         }
-        b_global_ = b;
         uint8_t *pixel = (uint8_t *)(&pixels_[idx]);
         pixel[0]       = 0xE0 | std::min(b, (uint16_t)31);
         return Result::OK;
