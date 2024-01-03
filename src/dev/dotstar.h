@@ -4,6 +4,7 @@
 
 #include "per/i2c.h"
 #include "per/spi.h"
+#include <cmsis_gcc.h>
 
 namespace daisy
 {
@@ -48,9 +49,10 @@ class DotStarSpiTransport
         spi_.Init(spi_cfg);
     };
 
-    bool Write(uint8_t *data, size_t size)
+    bool Write(const uint8_t *data, size_t size)
     {
-        return spi_.BlockingTransmit(data, size) == SpiHandle::Result::OK;
+        return spi_.BlockingTransmit(const_cast<uint8_t *>(data), size)
+               == SpiHandle::Result::OK;
     };
 
   private:
@@ -114,15 +116,32 @@ class DotStar
         r_offset_ = ((config.color_order >> 4) & 0b11) + 1;
         g_offset_ = ((config.color_order >> 2) & 0b11) + 1;
         b_offset_ = (config.color_order & 0b11) + 1;
+        dither_   = 0;
         // Minimum brightness by default. These LEDs can
         // be very current hungry. See datasheet for details.
         SetAllGlobalBrightness(1);
+        SetGamma(2.6f);
         Clear();
         return Result::OK;
     };
 
+
     /**
-     * \brief Set global brightness for all pixels
+     * @brief Sets gamma correction factor for 8-bit software brightness calc
+     *
+     * @param gamma Gamma (usually between 1 and 3)
+     */
+    void SetGamma(float gamma)
+    {
+        for(size_t i = 0; i < 256; i++)
+        {
+            gammaCorrectionLUT_8Bit_[i] = static_cast<uint8_t>(
+                roundf(255.0f * powf(i / 255.0f, gamma)));
+        }
+    }
+
+    /**
+     * \brief Set global hardware brightness (const current) for all pixels
      * \details "Global brightness" for the SK9822 device sets the
      *          equivalent constant current for the LEDs, not a pre-multiplied PWM
      *          brightness scaling for the pixel's RGB value. See SK9822 datasheet
@@ -142,7 +161,7 @@ class DotStar
     };
 
     /**
-     * \brief Set global brightness for a single pixel
+     * \brief Set global hardware brightness (const current) for a single pixel
      * \details "Global brightness" for the SK9822 device sets the
      *          equivalent constant current for the LEDs. See datasheet
      *          for details.
@@ -180,22 +199,28 @@ class DotStar
      *
      * \param idx Index of the pixel
      * \param color Color object to apply to the pixel
+     * \param brightness 8-bit software brightness for pixel
      */
-    void SetPixelColor(uint16_t idx, const Color &color)
+    void SetPixelColor(uint16_t     idx,
+                       const Color &color,
+                       uint16_t     brightness = 255)
     {
-        SetPixelColor(idx, color.Red8(), color.Green8(), color.Blue8());
+        SetPixelColor(
+            idx, color.Red8(), color.Green8(), color.Blue8(), brightness);
     }
 
     /**
      * \brief Sets color of a single pixel
      * \param color 32-bit integer representing 24-bit RGB color. MSB ignored.
+     * \param brightness 8-bit software brightness for pixel
      */
-    void SetPixelColor(uint16_t idx, uint32_t color)
+    void
+    SetPixelColor(uint16_t idx, uint32_t color, uint16_t brightness = 255)
     {
         uint8_t r = (color >> 16) & 0xFF;
         uint8_t g = (color >> 8) & 0xFF;
         uint8_t b = color & 0xFF;
-        SetPixelColor(idx, r, g, b);
+        SetPixelColor(idx, r, g, b, brightness);
     }
 
     /**
@@ -205,8 +230,13 @@ class DotStar
      * \param r 8-bit red value to apply to pixel
      * \param g 8-bit green value to apply to pixel
      * \param b 8-bit blue value to apply to pixel
+     * \param brightness 8-bit software brightness for pixel
      */
-    Result SetPixelColor(uint16_t idx, uint8_t r, uint8_t g, uint8_t b)
+    Result SetPixelColor(uint16_t idx,
+                         uint8_t  r,
+                         uint8_t  g,
+                         uint8_t  b,
+                         uint16_t brightness = 255)
     {
         if(idx >= num_pixels_)
         {
@@ -214,32 +244,35 @@ class DotStar
         }
         uint8_t *pixel   = (uint8_t *)(&pixels_[idx]);
         pixel[r_offset_] = r;
-        pixel[b_offset_] = b;
         pixel[g_offset_] = g;
+        pixel[b_offset_] = b;
+        brightness_[idx] = brightness;
         return Result::OK;
     };
 
     /**
      * \brief Fills all pixels with color
      * \param color Color with which to fill all pixels
+     * \param brightness 8-bit software brightness for all pixels
      */
-    void Fill(const Color &color)
+    void Fill(const Color &color, uint16_t brightness = 255)
     {
         for(uint16_t i = 0; i < num_pixels_; i++)
         {
-            SetPixelColor(i, color);
+            SetPixelColor(i, color, brightness);
         }
     }
 
     /**
      * \brief Fills all pixels with color
      * \param color 32-bit integer representing 24-bit RGB color. MSB ignored.
+     * \param brightness 8-bit software brightness for all pixels
      */
-    void Fill(uint32_t color)
+    void Fill(uint32_t color, uint16_t brightness = 255)
     {
         for(uint16_t i = 0; i < num_pixels_; i++)
         {
-            SetPixelColor(i, color);
+            SetPixelColor(i, color, brightness);
         }
     }
 
@@ -248,12 +281,13 @@ class DotStar
      * \param r 8-bit red value to apply to pixels
      * \param g 8-bit green value to apply to pixels
      * \param b 8-bit blue value to apply to pixels
+     * \param brightness 8-bit software brightness for all pixels
      */
-    void Fill(uint8_t r, uint8_t g, uint8_t b)
+    void Fill(uint8_t r, uint8_t g, uint8_t b, uint16_t brightness = 255)
     {
         for(uint16_t i = 0; i < num_pixels_; i++)
         {
-            SetPixelColor(i, r, g, b);
+            SetPixelColor(i, r, g, b, brightness);
         }
     }
 
@@ -261,9 +295,9 @@ class DotStar
      *         Does not reset global brightnesses.
      *         Does not write pixel buffer data to LEDs.
      */
-    void Clear(bool reset_brightness = true)
+    void Clear(bool reset_global_brightness = true)
     {
-        if (reset_brightness)
+        if(reset_global_brightness)
         {
             SetAllGlobalBrightness(b_global_);
         }
@@ -276,15 +310,43 @@ class DotStar
     /** \brief Writes current pixel buffer data to LEDs */
     Result Show()
     {
-        uint8_t sf[4] = {0x00, 0x00, 0x00, 0x00};
-        uint8_t ef[4] = {0xFF, 0xFF, 0xFF, 0xFF};
+        uint8_t data[4] = {};
+
+        const uint8_t shift = 8 - kDitherBits;
+        const uint8_t sf[4] = {0x00, 0x00, 0x00, 0x00};
+        const uint8_t ef[4] = {0xFF, 0xFF, 0xFF, 0xFF};
+
         if(!transport_.Write(sf, 4))
         {
             return Result::ERR_TRANSPORT;
         }
+
         for(uint16_t i = 0; i < num_pixels_; i++)
         {
-            if(!transport_.Write((uint8_t *)&pixels_[i], 4))
+            const uint8_t *pixel = (uint8_t *)&pixels_[i];
+
+            // Apply 8-bit brightness and shift according to dither depth
+            // (i.e. if 2 bits of dither, we shift so multiplication is a 10-bit number)
+            uint16_t r = (pixel[r_offset_] * brightness_[i]) >> shift;
+            uint16_t g = (pixel[g_offset_] * brightness_[i]) >> shift;
+            uint16_t b = (pixel[b_offset_] * brightness_[i]) >> shift;
+
+            // apply dither and truncate
+            r = r > 0 ? __USAT((r + dither_) >> kDitherBits, 8) : 0;
+            g = g > 0 ? __USAT((g + dither_) >> kDitherBits, 8) : 0;
+            b = b > 0 ? __USAT((b + dither_) >> kDitherBits, 8) : 0;
+
+            // gamma correction
+            r = gammaCorrectionLUT_8Bit_[r];
+            g = gammaCorrectionLUT_8Bit_[g];
+            b = gammaCorrectionLUT_8Bit_[b];
+
+            data[0]         = pixel[0]; // copy global brightness
+            data[r_offset_] = r;
+            data[g_offset_] = g;
+            data[b_offset_] = b;
+
+            if(!transport_.Write(data, 4))
             {
                 return Result::ERR_TRANSPORT;
             }
@@ -293,16 +355,22 @@ class DotStar
         {
             return Result::ERR_TRANSPORT;
         }
+        dither_ = (dither_ + 1) & ((1 << kDitherBits) - 1);
+        // dither_ = rand() & ((1 << kDitherBits) - 1);
         return Result::OK;
     };
 
   private:
-    static const size_t kMaxNumPixels = 64;
-    Transport           transport_;
-    uint16_t            num_pixels_;
-    uint32_t            pixels_[kMaxNumPixels];
-    uint8_t             r_offset_, g_offset_, b_offset_;
-    uint16_t            b_global_;
+    static constexpr size_t  kMaxNumPixels = 64;
+    static constexpr uint8_t kDitherBits   = 2;
+    Transport                transport_;
+    uint16_t                 num_pixels_;
+    uint32_t                 pixels_[kMaxNumPixels];
+    uint8_t                  brightness_[kMaxNumPixels];
+    uint8_t                  gammaCorrectionLUT_8Bit_[256];
+    uint8_t                  r_offset_, g_offset_, b_offset_;
+    uint16_t                 b_global_;
+    int16_t                  dither_;
 };
 
 using DotStarSpi = DotStar<DotStarSpiTransport>;
