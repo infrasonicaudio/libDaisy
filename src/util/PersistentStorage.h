@@ -87,17 +87,25 @@ class PersistentStorage
             RestoreDefaults();
             return;
         }
-        if(storage_data->version != CurrentVersion)
+
+        // If storage data has a newer version number than
+        // the most recent template param version, that's ok -
+        // we assume data structure is backward-compatible
+        if(storage_data->version < CurrentVersion)
         {
             uint32_t old_version = storage_data->version;
             // MUST BE VALUE COPY, NOT REF -
-            // memory needs to live in stack not flash space
+            // memory needs to live in stack, not flash space
             auto settings = storage_data->user_data;
-            if(!settings.Migrate(old_version, CurrentVersion))
-            {
-                RestoreDefaults();
-                return;
-            }
+            settings.Migrate(old_version, CurrentVersion);
+
+            // TODO: Make reversion to defaults optional?
+            // We don't want to blow away calibration data
+            // if(!settings.Migrate(old_version, CurrentVersion))
+            // {
+            //     // RestoreDefaults();
+            //     // return;
+            // }
 
             state_    = cur_state;
             settings_ = settings;
