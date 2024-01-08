@@ -324,15 +324,17 @@ else
 C_DEFS += -DNDEBUG=1 -DRELEASE=1
 endif
 
+C_USR_FLAGS ?=
+
 CFLAGS += \
--finline-functions
+-finline-functions \
+$(C_USR_FLAGS)
 
 # C++ Flags
 CPPFLAGS = $(CFLAGS) $(CPP_WARNINGS)
 CPPFLAGS += \
 -fno-exceptions \
--fno-rtti \
--funroll-loops
+-fno-rtti
 
 C_STANDARD = -std=gnu11
 CPP_STANDARD += -std=gnu++14
