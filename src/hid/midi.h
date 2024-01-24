@@ -42,8 +42,9 @@ class MidiUartTransport
          *
          *  @details By default this uses a shared buffer in DMA_BUFFER_MEM_SECTION,
          *           which can only be utilized for a single UART peripheral. To
-         *           use MIDI with multiple UART peripherals, you must provide your own
-         *           buffer, allocated to a DMA-capable memory section.
+         *           use MIDI with multiple UART peripherals, first call `WithAltDMA()`
+         *           to intialize the buffer parameters to an alternate shared buffer,
+         *           or provide your own buffer in DMA-compatible memory and set `use_alt_dma` to true.
          */
         uint8_t* rx_buffer;
 
@@ -55,7 +56,23 @@ class MidiUartTransport
          */
         size_t rx_buffer_size;
 
+        /** Whether to use alternate DMA stream for Rx
+         *
+         *  @details This is false by default, and automatically set to true by calling `WithAltDma()` on the
+         *           config struct. If the application is using two MIDI UART handlers with separate peripherals,
+         *           you must set this to `true` on one of them and provide an alternate `rx_buffer`.
+         */
+        bool use_alt_dma;
+
         Config();
+        ~Config() = default;
+
+        void Defaults();
+
+        /**
+         *  Configures the struct for alternate Rx DMA (separate buffer and stream).
+         */
+        void WithAltDMA();
     };
 
     /** @brief Initialization of UART using config struct */
@@ -71,9 +88,10 @@ class MidiUartTransport
         uart_config.wordlength = UartHandler::Config::WordLength::BITS_8;
 
         //user settings
-        uart_config.periph        = config.periph;
-        uart_config.pin_config.rx = config.rx;
-        uart_config.pin_config.tx = config.tx;
+        uart_config.periph                = config.periph;
+        uart_config.pin_config.rx         = config.rx;
+        uart_config.pin_config.tx         = config.tx;
+        uart_config.use_alt_rx_listen_dma = config.use_alt_dma;
 
         rx_buffer      = config.rx_buffer;
         rx_buffer_size = config.rx_buffer_size;
