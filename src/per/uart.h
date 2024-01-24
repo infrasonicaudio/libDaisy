@@ -1,4 +1,4 @@
-/* 
+/*
 TODO
 - Overflow handling, etc. for Rx Queue.
 */
@@ -15,7 +15,7 @@ namespace daisy
     @{
     */
 
-/** 
+/**
     Uart Peripheral
     @author shensley
     @date March 2020
@@ -76,10 +76,11 @@ class UartHandler
         Config()
         {
             // user must init periph, pin_config, and mode
-            stopbits   = StopBits::BITS_1;
-            parity     = Parity::NONE;
-            wordlength = WordLength::BITS_8;
-            baudrate   = 31250;
+            stopbits              = StopBits::BITS_1;
+            parity                = Parity::NONE;
+            wordlength            = WordLength::BITS_8;
+            baudrate              = 31250;
+            use_alt_rx_listen_dma = false;
         }
 
         Peripheral periph;
@@ -88,11 +89,15 @@ class UartHandler
         Mode       mode;
         WordLength wordlength;
         uint32_t   baudrate;
+
+        /// If true, will use DMA2_Stream5 for UART Rx listen
+        /// instead of default DMA1_Stream5
+        bool use_alt_rx_listen_dma;
     };
 
 
     UartHandler() : pimpl_(nullptr) {}
-    UartHandler(const UartHandler& other) = default;
+    UartHandler(const UartHandler& other)            = default;
     UartHandler& operator=(const UartHandler& other) = default;
 
     /** Return values for Uart functions. */
@@ -119,14 +124,14 @@ class UartHandler
     /** A callback to be executed after a standard dma transfer is completed. */
     typedef void (*EndCallbackFunctionPtr)(void* context, Result result);
 
-    /** A callback to be executed when using circular/listening mode 
+    /** A callback to be executed when using circular/listening mode
      *  includes a callback context, as well as the data to be handled
-     *  This fires either after half of the size of the user-defined buffer 
+     *  This fires either after half of the size of the user-defined buffer
      *  has been transferred from peripheral to memory, or after an IDLE frame
      *  is detected.
-     * 
+     *
      *  @param data byte-buffer to fill with data
-     *  @param size size of the "data" byte buffer 
+     *  @param size size of the "data" byte buffer
      *  @param context user-defined context variable to pass state to the callback
      *  @param result state of the UART Handler result, should be OK if things are OK.
      */
@@ -135,10 +140,10 @@ class UartHandler
                                                   void*    context,
                                                   Result   result);
 
-    /** Blocking transmit 
+    /** Blocking transmit
     \param buff input buffer
     \param size  buffer size
-    \param timeout how long in milliseconds the function will wait 
+    \param timeout how long in milliseconds the function will wait
                    before returning without successful communication
     */
     Result BlockingTransmit(uint8_t* buff, size_t size, uint32_t timeout = 100);
@@ -152,14 +157,14 @@ class UartHandler
     Result
     BlockingReceive(uint8_t* buffer, uint16_t size, uint32_t timeout = 100);
 
-    /** DMA-based transmit 
+    /** DMA-based transmit
     \param *buff input buffer
     \param size  buffer size
     \param start_callback   A callback to execute when the transfer starts, or NULL.
                             The callback is called from an interrupt, so keep it fast.
     \param end_callback     A callback to execute when the transfer finishes, or NULL.
                             The callback is called from an interrupt, so keep it fast.
-    \param callback_context A pointer that will be passed back to you in the callbacks.     
+    \param callback_context A pointer that will be passed back to you in the callbacks.
     \return Whether the transmit was successful or not
     */
     Result DmaTransmit(uint8_t*                              buff,
@@ -168,14 +173,14 @@ class UartHandler
                        UartHandler::EndCallbackFunctionPtr   end_callback,
                        void*                                 callback_context);
 
-    /** DMA-based receive 
+    /** DMA-based receive
     \param *buff input buffer
     \param size  buffer size
     \param start_callback   A callback to execute when the transfer starts, or NULL.
                             The callback is called from an interrupt, so keep it fast.
     \param end_callback     A callback to execute when the transfer finishes, or NULL.
                             The callback is called from an interrupt, so keep it fast.
-    \param callback_context A pointer that will be passed back to you in the callbacks.    
+    \param callback_context A pointer that will be passed back to you in the callbacks.
     \return Whether the receive was successful or not
     */
     Result DmaReceive(uint8_t*                              buff,
@@ -184,19 +189,19 @@ class UartHandler
                       UartHandler::EndCallbackFunctionPtr   end_callback,
                       void*                                 callback_context);
 
-    /** Starts the DMA Reception in "Listen" mode. 
-     *  In this mode the DMA is configured for circular 
+    /** Starts the DMA Reception in "Listen" mode.
+     *  In this mode the DMA is configured for circular
      *  behavior, and the IDLE interrupt is enabled.
-     * 
+     *
      *  At TC, HT, and IDLE interrupts data must be processed.
-     * 
+     *
      *  Size must be set so that at maximum bandwidth, the software
      *  has time to process N bytes before the next circular IRQ is fired
-     * 
+     *
      *  @param buff buffer of data accessible by DMA.
      *  @param size size of buffer
      *  @param cb callback that happens containing new bytes to process in software
-     *  @param callback_context pointer to user-defined data accessible from callback 
+     *  @param callback_context pointer to user-defined data accessible from callback
      */
     Result DmaListenStart(uint8_t*                      buff,
                           size_t                        size,
