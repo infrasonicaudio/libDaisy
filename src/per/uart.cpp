@@ -189,6 +189,7 @@ void UartHandler::Impl::GlobalInit()
 {
     // init the scheduler queue
     dma_active_peripheral_ = -1;
+    alt_dma_active_peripheral_ = -1;
     for(int per = 0; per < kNumUartWithDma; per++)
         queued_dma_transfers_[per] = UartHandler::Impl::UartDmaJob();
 }
