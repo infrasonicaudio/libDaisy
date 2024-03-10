@@ -47,7 +47,7 @@ SYSTEM_FILES_DIR ?= \
 # source
 ######################################
 
-CPP_SOURCES ?= 
+CPP_SOURCES ?=
 
 C_SOURCES += \
 $(SYSTEM_FILES_DIR)/startup_stm32h750xx.c
@@ -68,13 +68,13 @@ PREFIX = arm-none-eabi-
 ifdef GCC_PATH
 CC = $(GCC_PATH)/$(PREFIX)gcc
 AS = $(GCC_PATH)/$(PREFIX)gcc -x assembler-with-cpp
-CXX = $(GCC_PATH)/$(PREFIX)g++ 
+CXX = $(GCC_PATH)/$(PREFIX)g++
 GDB = $(GCC_PATH)/$(PREFIX)gdb
 CP = $(GCC_PATH)/$(PREFIX)objcopy
 SZ = $(GCC_PATH)/$(PREFIX)size
 else
 CC = $(PREFIX)gcc
-CXX = $(PREFIX)g++ 
+CXX = $(PREFIX)g++
 GDB = $(PREFIX)gdb
 AS = $(PREFIX)gcc -x assembler-with-cpp
 CP = $(PREFIX)objcopy
@@ -128,7 +128,7 @@ endif
 # AS includes
 AS_INCLUDES =
 
-C_INCLUDES ?= 
+C_INCLUDES ?=
 
 C_INCLUDES += \
 -I$(LIBDAISY_DIR) \
@@ -174,11 +174,13 @@ ASFLAGS += -g -ggdb
 endif
 
 CFLAGS = $(MCU) $(C_DEFS) $(C_INCLUDES) $(OPT) -Wall -Wno-missing-attributes -fasm -fdata-sections -ffunction-sections -Wno-stringop-overflow
-
 CFLAGS += -g -ggdb
 
 # Generate dependency information
 CFLAGS += -MMD -MP -MF"$(@:%.o=%.d)"
+
+C_USER_FLAGS ?=
+CFLAGS += $(C_USER_FLAGS)
 
 CPPFLAGS = $(CFLAGS)
 CPPFLAGS += \
@@ -191,6 +193,9 @@ CPPFLAGS += \
 -fno-unwind-tables \
 -fno-rtti \
 -Wno-register
+
+CPP_USER_FLAGS ?=
+CPPFLAGS += $(CPP_USER_FLAGS)
 
 C_STANDARD = -std=gnu11
 CPP_STANDARD ?= -std=gnu++14
