@@ -74,10 +74,25 @@ class StackBase
     T PopBack()
     {
         if(IsEmpty())
+        {
             return T();
+        }
         else
         {
             return buffer_[--bufferHead_];
+        }
+    }
+
+    /** returns the element at the back of the buffer (top of stack) without popping it */
+    T PeekBack() const
+    {
+        if(IsEmpty())
+        {
+            return T();
+        }
+        else
+        {
+            return buffer_[bufferHead_ - 1];
         }
     }
 
