@@ -166,7 +166,7 @@ class StackBase
     }
 
     /** Returns true if the buffer contains an element equal to the provided value */
-    bool Contains(const T& element)
+    bool Contains(const T& element) const
     {
         int idx = bufferHead_ - 1;
         while(idx >= 0)
@@ -176,6 +176,16 @@ class StackBase
             idx--;
         }
         return false;
+    }
+
+    int FirstIndexOf(const T& element) const
+    {
+        for(size_t idx = 0; idx < bufferHead_; idx++)
+        {
+            if(buffer_[idx] == element)
+                return idx;
+        }
+        return -1;
     }
 
     /** Returns the number of elements in the buffer that are equal to the provided value */
