@@ -143,7 +143,7 @@ class StackBase
         return numRemoved;
     }
 
-    /** adds a single element to the buffer and returns true if successfull */
+    /** adds a single element to the buffer and returns true if successful */
     bool Insert(uint32_t idx, const T& item)
     {
         if(bufferHead_ >= bufferSize_)
@@ -156,13 +156,43 @@ class StackBase
             return true;
         }
 
-        for(uint32_t i = bufferHead_ - 1; i >= idx; i--)
+        for(uint32_t i = bufferHead_; i > idx; i--)
         {
-            buffer_[i + 1] = buffer_[i];
+            buffer_[i] = buffer_[i - 1];
         }
         buffer_[idx] = item;
         bufferHead_++;
         return true;
+    }
+
+    bool InsertSorted(const T& item)
+    {
+        if(IsFull())
+            return false;
+
+        if(IsEmpty())
+        {
+            PushBack(item);
+            return true;
+        }
+
+        // find insert position
+        if(item >= PeekBack())
+        {
+            PushBack(item);
+            return true;
+        }
+
+        bool success = false;
+        for(size_t idx = 0; idx < bufferHead_; idx++)
+        {
+            if(buffer_[idx] >= item)
+            {
+                success = Insert(idx, item);
+                break;
+            }
+        }
+        return success;
     }
 
     /** Returns true if the buffer contains an element equal to the provided value */
