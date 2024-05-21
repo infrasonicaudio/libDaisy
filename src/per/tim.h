@@ -158,6 +158,16 @@ class TimerHandle
      ***/
     uint32_t GetUs();
 
+    /** @brief Returns the time between the provided ticks scaled as microseconds
+     ** @param current The current tick for the time difference.
+     ** @param last The previous tick for the time difference.
+     ** Use care when using for measurements and ensure that
+     ** the TIM period can handle the maximum desired measurement.
+     ** In this case the period must be a full 32-bits worth of ticks
+     ** for the overflow handling to work correctly.
+     ***/
+    uint32_t GetUsBetweenTicks(uint32_t current, uint32_t last);
+
     /** @brief Stay within this function for del ticks */
     void DelayTick(uint32_t del);
 

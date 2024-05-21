@@ -161,7 +161,7 @@ class DotStar
     };
 
     /**
-     * \brief Set global hardware brightness (const current) for a single pixel
+     * \brief Set global brightness for a single pixel
      * \details "Global brightness" for the SK9822 device sets the
      *          equivalent constant current for the LEDs. See datasheet
      *          for details.

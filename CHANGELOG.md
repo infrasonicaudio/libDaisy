@@ -2,6 +2,72 @@
 
 ## Unreleased
 
+### Features
+
+### Bugfixes
+
+### Migrating
+
+## v7.0.1
+
+### Features
+- Change `AudioHandle::Config` to an aggregate type, allows for aggregate init. Doesn't break existing code.
+- Add SerialRead example, shows how to read via Serial over USB
+- Add SH1106 OLED driver
+
+### Bugfixes
+- Fix float range for `Random::GetFloat()`
+- Move SAI initialized check so it isn't a no-op
+
+## v7.0.0
+
+### Features
+- Update internal CMSIS and HAL.
+- Adds new HAL module support via `src/sys/stm32h7xx_hal_conf.h`
+  - Digital Temperature Sensor
+  - Filter Math Accelerator (FMAC)
+  - Octo-SPI Controller (OSPI)
+  - Digital Filter for Delta-Sigma Modulation
+  - CORDIC co-processor block
+- Moves relevant HAL, CMSIS, Middleware code to submodules:
+  - https://github.com/ARM-software/CMSIS_5
+  - https://github.com/STMicroelectronics/cmsis_device_h7
+  - https://github.com/STMicroelectronics/stm32h7xx_hal_driver
+  - https://github.com/ARM-software/CMSIS-DSP
+  - https://github.com/STMicroelectronics/stm32_mw_usb_device
+
+### Bugfixes
+- Very minor bugfix in CpuLoadMeter_gtest.cpp so that a number would no longer overflow when bitshifting left
+
+### Migrating
+- Updating an existing libDaisy install via `git pull` will require you to run `git restore . --recurse-submodules` before it will compile.
+  - Note, this will also undo any local changes you may have to the library. Make sure to stash those!
+- If you clone a fresh copy of libDaisy with `git clone https://www.github.com/electro-smith/libDaisy --recurse-submodules`, this will not be necessary
+- Breaking changes:
+  - `GPIO::Mode::OUTPUT_OD` renamed to `GPIO::Mode::OPEN_DRAIN` due to a name conflict collision
+  - Compiled code size has increased by up to 7%
+
+## v6.0.0
+
+### Features
+
+* bootloader: Add local BootloaderBlink example for testing the bootloader and its various configs
+* bootloader: Add four bin variants: internal / external DFU, and 10ms / 2000ms timeouts
+* core: Add USE_DAISYSP_LGPL flag to core/Makefile for DaisySP_LGPL support.
+* bootloader: added `System::BootloaderMode::DAISY`, `System::BootloaderMode::DAISY_SKIP_TIMEOUT`, and `System::BootloaderMode::DAISY_INFINITE_TIMEOUT` options to `System::ResetToBootloader` method for better firmware updating flexibility.
+
+### Bug fixes
+
+* Fix link to electro-smith website in README
+* bootloader: pins `D0`, `D29` and `D30` are no longer stuck when using the Daisy bootloader
+* Color: Fixed bug with init not setting the green value correctly
+
+#### Bootloader
+
+* This version of libDaisy and greater will be compatible with any version of the Daisy bootloader, meaning you won't have to update the bootloader on your product if you want the latest changes to libDaisy.
+* However, for newer versions of the bootloader, you must use a compatible version of libDaisy.
+  * Daisy bootloader v6.0 and up will only be compatible with libDaisy v5.3 and up.
+
 ## v5.4.0
 
 ### Features

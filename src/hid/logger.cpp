@@ -84,7 +84,7 @@ void Logger<dest>::TransmitBuf()
             tx_ptr_ = 0;
         }
         /** otherwise do not reset tx_ptr_
-         *  accumulate data while buffer size permits 
+         *  accumulate data while buffer size permits
          */
     }
 }
@@ -120,8 +120,10 @@ void Logger<dest>::AppendNewLine()
 template class Logger<LOGGER_INTERNAL>;
 template class Logger<LOGGER_EXTERNAL>;
 template class Logger<LOGGER_SEMIHOST>;
+template class Logger<LOGGER_UART_7>;
 
 /** LoggerImpl static member variables */
-UsbHandle LoggerImpl<LOGGER_INTERNAL>::usb_handle_;
-UsbHandle LoggerImpl<LOGGER_EXTERNAL>::usb_handle_;
+UsbHandle   LoggerImpl<LOGGER_INTERNAL>::usb_handle_;
+UsbHandle   LoggerImpl<LOGGER_EXTERNAL>::usb_handle_;
+UartHandler LoggerImpl<LOGGER_UART_7>::uart_handle_;
 } // namespace daisy

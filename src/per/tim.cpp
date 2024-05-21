@@ -32,6 +32,7 @@ class TimerHandle::Impl
     uint32_t            GetTick();
     uint32_t            GetMs();
     uint32_t            GetUs();
+    uint32_t            GetUsBetweenTicks(uint32_t current, uint32_t last);
 
     void DelayTick(uint32_t del);
     void DelayMs(uint32_t del);
@@ -218,6 +219,11 @@ uint32_t TimerHandle::Impl::GetMs()
 uint32_t TimerHandle::Impl::GetUs()
 {
     return GetTick() / (GetFreq() / 1000000);
+}
+
+uint32_t TimerHandle::Impl::GetUsBetweenTicks(uint32_t current, uint32_t last)
+{
+    return (current - last) / (GetFreq() / 1000000);
 }
 
 void TimerHandle::Impl::DelayTick(uint32_t del)
@@ -424,6 +430,10 @@ uint32_t TimerHandle::GetMs()
 uint32_t TimerHandle::GetUs()
 {
     return pimpl_->GetUs();
+}
+uint32_t TimerHandle::GetUsBetweenTicks(uint32_t current, uint32_t last)
+{
+    return pimpl_->GetUsBetweenTicks(current, last);
 }
 
 void TimerHandle::DelayTick(uint32_t del)
