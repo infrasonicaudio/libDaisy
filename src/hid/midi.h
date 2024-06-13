@@ -217,22 +217,27 @@ class MidiHandler
      */
     MidiEvent PopEvent() { return rx_event_q_.PopFront(); }
 
-    /** SendMessage
-    Send raw bytes as message
+    /**
+        Immediately send raw bytes as message, bypassing queue
     */
-    void SendMessage(const MidiTxMessage& msg) { tx_msg_q_.PushBack(msg); }
+    void SendMessage(const uint8_t* bytes, size_t size)
+    {
+        transport_.Tx(const_cast<uint8_t*>(bytes), size);
+    }
+
+    void EnqueueMessage(const MidiTxMessage& msg) { tx_msg_q_.PushBack(msg); }
 
     /** Higher priority message queue for ISR (clock, etc)
      *  These are transmitted in FIFO order, but *before*
      *  the non-ISR message queue
      */
-    void SendMessageFromISR(const MidiTxMessage& msg)
+    void EnqueueMessageFromISR(const MidiTxMessage& msg)
     {
         tx_msg_q_isr_.PushBack(msg);
     }
 
     /** Transmit enqueued messages*/
-    void TransmitMessages()
+    void TransmitEnqueuedMessages()
     {
         // First process and transmit ISR queue
         processAndTransmitMessageQueue(tx_msg_q_isr_);
