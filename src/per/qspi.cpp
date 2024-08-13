@@ -46,6 +46,7 @@ class QSPIHandle::Impl
     QSPIHandle::Result Erase(uint32_t start_addr, uint32_t end_addr);
 
     QSPIHandle::Result EraseSector(uint32_t address);
+    QSPIHandle::Result EraseBlock(uint32_t address, bool is_32k);
 
     uint32_t GetPin(size_t pin);
 
@@ -356,10 +357,51 @@ QSPIHandle::Result QSPIHandle::Impl::EraseSector(uint32_t address)
     else
     {
         s_command.InstructionMode = QSPI_INSTRUCTION_1_LINE;
-        s_command.Instruction     = SECTOR_ERASE_CMD;
+        s_command.Instruction     = BLOCK_ERASE_CMD;
         s_command.AddressMode     = QSPI_ADDRESS_1_LINE;
     }
     s_command.AddressSize       = QSPI_ADDRESS_24_BITS;
+    s_command.AlternateByteMode = QSPI_ALTERNATE_BYTES_NONE;
+    s_command.DataMode          = QSPI_DATA_NONE;
+    s_command.DummyCycles       = 0;
+    s_command.NbData            = 1;
+    s_command.DdrMode           = QSPI_DDR_MODE_DISABLE;
+    s_command.DdrHoldHalfCycle  = QSPI_DDR_HHC_ANALOG_DELAY;
+    s_command.SIOOMode          = QSPI_SIOO_INST_EVERY_CMD;
+    s_command.Address           = address;
+
+    RETURN_IF_ERR(CheckProgramMemory());
+    // Erasing takes a long time anyway, so not much point trying to
+    // minimize reinitializations
+    RETURN_IF_ERR(SetMode(Config::Mode::INDIRECT_POLLING));
+
+    if(WriteEnable() != QSPIHandle::Result::OK)
+    {
+        ERR_RECOVERY(Status::E_HAL_ERROR);
+    }
+    if(HAL_QSPI_Command(&halqspi_, &s_command, HAL_QPSI_TIMEOUT_DEFAULT_VALUE)
+       != HAL_OK)
+    {
+        ERR_RECOVERY(Status::E_HAL_ERROR);
+    }
+    if(AutopollingMemReady(HAL_QPSI_TIMEOUT_DEFAULT_VALUE)
+       != QSPIHandle::Result::OK)
+    {
+        ERR_RECOVERY(Status::E_HAL_ERROR);
+    }
+
+    RETURN_IF_ERR(SetMode(Config::Mode::MEMORY_MAPPED));
+    return QSPIHandle::Result::OK;
+}
+
+__attribute__((optimize("O0")))
+QSPIHandle::Result QSPIHandle::Impl::EraseBlock(uint32_t address, bool is_32k)
+{
+    QSPI_CommandTypeDef s_command;
+    s_command.InstructionMode = QSPI_INSTRUCTION_1_LINE;
+    s_command.Instruction     = is_32k ? BLOCK_ERASE_32K_CMD : BLOCK_ERASE_CMD;
+    s_command.AddressMode     = QSPI_ADDRESS_1_LINE;
+    s_command.AddressSize     = QSPI_ADDRESS_24_BITS;
     s_command.AlternateByteMode = QSPI_ALTERNATE_BYTES_NONE;
     s_command.DataMode          = QSPI_DATA_NONE;
     s_command.DummyCycles       = 0;
@@ -897,6 +939,11 @@ QSPIHandle::Result QSPIHandle::EraseSector(uint32_t address)
     return pimpl_->EraseSector(address);
 }
 
+QSPIHandle::Result QSPIHandle::EraseBlock(uint32_t address, bool is_32k)
+{
+    return pimpl_->EraseBlock(address, is_32k);
+}
+
 void* QSPIHandle::GetData(uint32_t offset)
 {
     return pimpl_->GetData(offset);
@@ -920,11 +967,11 @@ extern "C" void HAL_QSPI_MspInit(QSPI_HandleTypeDef* qspiHandle)
         __HAL_RCC_GPIOB_CLK_ENABLE();
         // Seems the same for all pin outs so far.
         uint8_t       af_config[qspi_impl.GetNumPins()] = {GPIO_AF10_QUADSPI,
-                                                     GPIO_AF10_QUADSPI,
-                                                     GPIO_AF9_QUADSPI,
-                                                     GPIO_AF9_QUADSPI,
-                                                     GPIO_AF9_QUADSPI,
-                                                     GPIO_AF10_QUADSPI};
+                                                           GPIO_AF10_QUADSPI,
+                                                           GPIO_AF9_QUADSPI,
+                                                           GPIO_AF9_QUADSPI,
+                                                           GPIO_AF9_QUADSPI,
+                                                           GPIO_AF10_QUADSPI};
         GPIO_TypeDef* port;
         for(uint8_t i = 0; i < qspi_impl.GetNumPins(); i++)
         {
@@ -978,28 +1025,28 @@ extern "C" void QUADSPI_IRQHandler(void)
 
 /* HAL Overwrite Implementation */
 
-/**QUADSPI GPIO Configuration    
+/**QUADSPI GPIO Configuration
     On Daisy Rev3:
     PG6     ------> QUADSPI_BK1_NCS
     PF8     ------> QUADSPI_BK1_IO0
     PF9     ------> QUADSPI_BK1_IO1
     PF7     ------> QUADSPI_BK1_IO2
     PF6     ------> QUADSPI_BK1_IO3
-    PB2     ------> QUADSPI_CLK 
+    PB2     ------> QUADSPI_CLK
     On Daisy Seed:
     PG6     ------> QUADSPI_BK1_NCS
     PF8     ------> QUADSPI_BK1_IO0
     PF9     ------> QUADSPI_BK1_IO1
     PF7     ------> QUADSPI_BK1_IO2
     PF6     ------> QUADSPI_BK1_IO3
-    PF10    ------> QUADSPI_CLK 
+    PF10    ------> QUADSPI_CLK
     On Audio BB:
     PG6     ------> QUADSPI_BK1_NCS
     PF8     ------> QUADSPI_BK1_IO0
     PF9     ------> QUADSPI_BK1_IO1
     PE2     ------> QUADSPI_BK1_IO2
     PF6     ------> QUADSPI_BK1_IO3
-    PF10    ------> QUADSPI_CLK 
+    PF10    ------> QUADSPI_CLK
     */
 //enum
 //{
