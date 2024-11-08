@@ -1,6 +1,9 @@
 #pragma once
 #ifndef DSY_HAL_MAP_H
 #define DSY_HAL_MAP_H
+#ifdef __cplusplus
+extern "C" {
+#endif
 #include "stm32h7xx_hal.h"
 #include "daisy_core.h"
 
@@ -17,12 +20,12 @@
 */
 
 /** \param  *p Pin pin to get
-    \return HAL GPIO_TypeDef as used in the HAL from a dsy_gpio_pin input. 
+    \return HAL GPIO_TypeDef as used in the HAL from a dsy_gpio_pin input.
 */
 GPIO_TypeDef *dsy_hal_map_get_port(const dsy_gpio_pin *p);
 
 /** \param  *p Pin pin to get
-    \return HAL GPIO Pin as used in the HAL from a dsy_gpio_pin input. 
+    \return HAL GPIO Pin as used in the HAL from a dsy_gpio_pin input.
 */
 uint16_t dsy_hal_map_get_pin(const dsy_gpio_pin *p);
 
@@ -30,5 +33,8 @@ uint16_t dsy_hal_map_get_pin(const dsy_gpio_pin *p);
 */
 void dsy_hal_map_gpio_clk_enable(dsy_gpio_port port);
 
+#ifdef __cplusplus
+}
 #endif
-/** @} */
+
+#endif
