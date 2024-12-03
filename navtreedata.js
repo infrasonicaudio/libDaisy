@@ -143,8 +143,6 @@ var NAVTREE =
         [ "All", "globals.html", "globals_dup" ],
         [ "Functions", "globals_func.html", null ],
         [ "Variables", "globals_vars.html", null ],
-        [ "Enumerations", "globals_enum.html", null ],
-        [ "Enumerator", "globals_eval.html", null ],
         [ "Macros", "globals_defs.html", "globals_defs" ]
       ] ]
     ] ]
@@ -154,12 +152,13 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "_abstract_menu_8h.html",
-"classdaisy_1_1_fixed_cap_str_base.html#a688c94fe6ed65f138675b9b2168a1d5d",
-"classdaisy_1_1_sai_handle.html#aac337760cd0a689081208684d3771615",
-"dir_220d2bd384b446346a1cdcf02b1b2295.html",
-"globals_g.html",
-"md_doc_2md_2__b1___development-_unit-_testing.html#autotoc_md64",
-"structdaisy_1_1_sai_handle_1_1_config.html#adace22abaff171f0c459cff4a44026fcabe2da78731d2386be1e8ace72a568eee"
+"classdaisy_1_1_fat_f_s_interface.html#a1ccb7d6bbc2cbf61026b5ce374017b7c",
+"classdaisy_1_1_s_h1106_driver.html",
+"daisy__core_8h.html#a0f3f80696b55547e8471a18de01b8e13a51da6674fae3df8f696481f783f5668e",
+"functions_func_n.html",
+"mcp23x17_8h.html#a4d0fda25eb2fa3a27bec48dc5871486b",
+"sr__4021_8h_source.html",
+"usb__midi_8h.html#a271533fd70083fec8006daa385671553"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';
