@@ -68,6 +68,18 @@ class AnalogControl
         coeff_ = val;
     }
 
+    /** Directly set the scaling factor used by the process function
+     *  Normally this will be set during initialization, but
+     *  the can be used when calibartion data is used to adjust the control.
+     */
+    inline void SetScale(const float scale) { scale_ = scale; }
+
+    /** Directly set the offset used by the process function
+     *  Normally this will be set during initialization, but
+     *  the can be used when calibartion data is used to adjust the control.
+     */
+    inline void SetOffset(const float offset) { offset_ = offset; }
+
     /** Returns the raw unsigned 16-bit value from the ADC */
     inline uint16_t GetRawValue() { return *raw_; }
 
