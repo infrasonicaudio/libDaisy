@@ -44,8 +44,8 @@ static void InitFS()
         {
             UsbErrorHandler();
         }
+        tud_init(0);
     }
-    tud_init(0);
     // if(USBD_RegisterClass(&hUsbDeviceFS, &USBD_CDC) != USBD_OK)
     // {
     //     UsbErrorHandler();
@@ -85,9 +85,8 @@ static void InitHS()
         {
             UsbErrorHandler();
         }
+        tud_init(1);
     }
-    tud_init(1);
-
 
     // if(USBD_RegisterClass(&hUsbDeviceHS, &USBD_CDC) != USBD_OK)
     // {
@@ -145,24 +144,19 @@ void UsbHandle::DeInit(UsbPeriph dev)
     HAL_PWREx_DisableUSBVoltageDetector();
 }
 
+// TODO: these are the same for current tinyusb implementation,
+// should be using separate USB periph interfaces if possible
 UsbHandle::Result UsbHandle::TransmitInternal(uint8_t* buff, size_t size)
 {
-    // return CDC_Transmit_FS(buff, size) == USBD_OK ? Result::OK : Result::ERR;
-    // auto ret = tud_cdc_write(buff, size) == size ? Result::OK : Result::ERR;
-    // tud_cdc_write_flush();
-    auto ret
-        = tud_cdc_n_write(0, buff, size) == size ? Result::OK : Result::ERR;
-    tud_cdc_n_write_flush(0);
+    auto ret = tud_cdc_write(buff, size) == size ? Result::OK : Result::ERR;
+    tud_cdc_write_flush();
     return ret;
 }
 UsbHandle::Result UsbHandle::TransmitExternal(uint8_t* buff, size_t size)
 {
-    auto ret
-        = tud_cdc_n_write(1, buff, size) == size ? Result::OK : Result::ERR;
-    tud_cdc_n_write_flush(1);
+    auto ret = tud_cdc_write(buff, size) == size ? Result::OK : Result::ERR;
+    tud_cdc_write_flush();
     return ret;
-
-    // return CDC_Transmit_HS(buff, size) == USBD_OK ? Result::OK : Result::ERR;
 }
 
 void UsbHandle::SetReceiveCallback(ReceiveCallback cb, UsbPeriph dev)

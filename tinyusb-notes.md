@@ -31,16 +31,16 @@ but the rest of the tinyusb config lives in libDaisy.
 
 ## USB CDC (Serial)
 
-This is the most straightforward of the USB device class ports, there's not much complexity
-involved at all.
-
 ### Changes
 
 * USB serial Tx now calls through to tinyUSB cdc functions (`tud_cdc_`)
+* Only one of internal (FS) or external (HS) can be used at a time for CDC - not both
 
 ### TODOs
 
+- [ ] Figure out if there's a way to setup CDC on both interfaces (int/ext aka FS/HS)
 - [ ] Rx callbacks in USBHandler probably don't work anymore, need to fix/adapt for tinyusb
+- [ ] BUG: sync start (wait for pc) of USB loggers doesn't work anymore
 
 ## USB MIDI
 
