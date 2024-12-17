@@ -45,7 +45,7 @@ static void InitFS()
             UsbErrorHandler();
         }
     }
-    tud_init(BOARD_TUD_RHPORT);
+    tud_init(0);
     // if(USBD_RegisterClass(&hUsbDeviceFS, &USBD_CDC) != USBD_OK)
     // {
     //     UsbErrorHandler();
@@ -151,15 +151,15 @@ UsbHandle::Result UsbHandle::TransmitInternal(uint8_t* buff, size_t size)
     // auto ret = tud_cdc_write(buff, size) == size ? Result::OK : Result::ERR;
     // tud_cdc_write_flush();
     auto ret
-        = tud_cdc_write(buff, size) == size ? Result::OK : Result::ERR;
-    tud_cdc_write_flush();
+        = tud_cdc_n_write(0, buff, size) == size ? Result::OK : Result::ERR;
+    tud_cdc_n_write_flush(0);
     return ret;
 }
 UsbHandle::Result UsbHandle::TransmitExternal(uint8_t* buff, size_t size)
 {
     auto ret
-        = tud_cdc_write(buff, size) == size ? Result::OK : Result::ERR;
-    tud_cdc_write_flush();
+        = tud_cdc_n_write(1, buff, size) == size ? Result::OK : Result::ERR;
+    tud_cdc_n_write_flush(1);
     return ret;
 
     // return CDC_Transmit_HS(buff, size) == USBD_OK ? Result::OK : Result::ERR;
