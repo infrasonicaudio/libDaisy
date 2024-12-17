@@ -3,6 +3,7 @@
 #include "usbh_midi.h"
 #include "hid/usb_midi.h"
 #include <cassert>
+#include "tusb.h"
 
 extern "C"
 {
@@ -129,35 +130,18 @@ void MidiUsbTransport::Impl::Init(Config config)
 
 void MidiUsbTransport::Impl::Tx(uint8_t* buffer, size_t size)
 {
-    int  attempt_count = config_.tx_retry_count;
-    bool should_retry;
-
-    MidiToUsb(buffer, size);
-    do
+    // TODO: for tinyusb integration, Tx retry loop has been
+    // completely disabled, see if we actually need it...
+    if(config_.periph == Config::HOST)
     {
-        if(config_.periph == Config::HOST)
-        {
-            MIDI_ErrorTypeDef result;
-            result       = USBH_MIDI_Transmit(pUSB_Host, tx_buffer_, tx_ptr_);
-            should_retry = (result == MIDI_BUSY) && attempt_count--;
-        }
-        else
-        {
-            UsbHandle::Result result;
-            if(config_.periph == Config::EXTERNAL)
-                result = usb_handle_.TransmitExternal(tx_buffer_, tx_ptr_);
-            else
-                result = usb_handle_.TransmitInternal(tx_buffer_, tx_ptr_);
-            should_retry
-                = (result == UsbHandle::Result::ERR) && attempt_count--;
-        }
-
-
-        if(should_retry)
-            System::DelayUs(100);
-    } while(should_retry);
-
-    tx_ptr_ = 0;
+        MIDI_ErrorTypeDef result;
+        result = USBH_MIDI_Transmit(pUSB_Host, tx_buffer_, tx_ptr_);
+        // should_retry = (result == MIDI_BUSY) && attempt_count--;
+    }
+    else
+    {
+        tud_midi_stream_write(0, buffer, size);
+    }
 }
 
 void MidiUsbTransport::Impl::UsbToMidi(uint8_t* buffer, uint8_t length)
