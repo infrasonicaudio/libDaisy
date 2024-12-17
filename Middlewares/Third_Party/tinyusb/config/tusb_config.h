@@ -17,7 +17,7 @@ extern "C"
 #define UAC2_ENTITY_MIC_INPUT_TERMINAL 0x11
 #define UAC2_ENTITY_MIC_OUTPUT_TERMINAL 0x13
 
-#define TUD_AUDIO_HEADSET_STEREO_DESC_LEN                                  \
+#define TUD_AUDIO_DEVICE_STEREO_DESC_LEN                                  \
     (TUD_AUDIO_DESC_IAD_LEN + TUD_AUDIO_DESC_STD_AC_LEN                    \
      + TUD_AUDIO_DESC_CS_AC_LEN + TUD_AUDIO_DESC_CLK_SRC_LEN               \
      + TUD_AUDIO_DESC_INPUT_TERM_LEN                                       \
@@ -33,7 +33,7 @@ extern "C"
      + TUD_AUDIO_DESC_TYPE_I_FORMAT_LEN + TUD_AUDIO_DESC_STD_AS_ISO_EP_LEN \
      + TUD_AUDIO_DESC_CS_AS_ISO_EP_LEN)
 
-#define TUD_AUDIO_HEADSET_STEREO_DESCRIPTOR(_itfnum, _stridx, _epout, _epin)                                                      \
+#define TUD_AUDIO_DEVICE_STEREO_DESCRIPTOR(_itfnum, _stridx, _epout, _epin)                                                       \
     /* Standard Interface Association Descriptor (IAD) */                                                                         \
     TUD_AUDIO_DESC_IAD(                                                                                                           \
         /*_firstitfs*/ _itfnum,                                                                                                   \
@@ -45,7 +45,7 @@ extern "C"
             _stridx), /* Class-Specific AC Interface Header Descriptor(4.7.2) */                                                  \
         TUD_AUDIO_DESC_CS_AC(                                                                                                     \
             /*_bcdADC*/ 0x0200,                                                                                                   \
-            /*_category*/ AUDIO_FUNC_HEADSET,                                                                                     \
+            /*_category*/ AUDIO_FUNC_MUSICAL_INSTRUMENT,                                                                          \
             /*_totallen*/ TUD_AUDIO_DESC_CLK_SRC_LEN                                                                              \
                 + TUD_AUDIO_DESC_FEATURE_UNIT_TWO_CHANNEL_LEN                                                                     \
                 + TUD_AUDIO_DESC_INPUT_TERM_LEN                                                                                   \
@@ -55,7 +55,7 @@ extern "C"
             AUDIO_CS_AS_INTERFACE_CTRL_LATENCY_POS), /* Clock Source Descriptor(4.7.2.1) */                                       \
         TUD_AUDIO_DESC_CLK_SRC(                                                                                                   \
             /*_clkid*/ UAC2_ENTITY_CLOCK,                                                                                         \
-            /*_attr*/ 3,                                                                                                          \
+            /*_attr - changed to fixed clock*/ 1,                                                                                 \
             /*_ctrl*/ 7,                                                                                                          \
             /*_assocTerm*/ 0x00,                                                                                                  \
             /*_stridx*/ 0x00), /* Input Terminal Descriptor(4.7.2.4) */                                                           \
@@ -83,7 +83,7 @@ extern "C"
             /*_stridx*/ 0x00), /* Output Terminal Descriptor(4.7.2.5) */                                                          \
         TUD_AUDIO_DESC_OUTPUT_TERM(                                                                                               \
             /*_termid*/ UAC2_ENTITY_SPK_OUTPUT_TERMINAL,                                                                          \
-            /*_termtype*/ AUDIO_TERM_TYPE_OUT_HEADPHONES,                                                                         \
+            /*_termtype*/ AUDIO_TERM_TYPE_OUT_GENERIC_SPEAKER,                                                                    \
             /*_assocTerm*/ 0x00,                                                                                                  \
             /*_srcid*/ UAC2_ENTITY_SPK_FEATURE_UNIT,                                                                              \
             /*_clkid*/ UAC2_ENTITY_CLOCK,                                                                                         \
@@ -181,7 +181,7 @@ extern "C"
             0x0000) /* Interface 2, Alternate 2 - alternate interface for data streaming */
 
 
-//--------------------------------------------------------------------+
+//-------------------------------------------------------------------+
 // Board Specific Configuration
 //--------------------------------------------------------------------+
 
@@ -256,7 +256,7 @@ extern "C"
 #define CFG_TUD_MIDI_RX_BUFSIZE (TUD_OPT_HIGH_SPEED ? 512 : 64)
 #define CFG_TUD_MIDI_TX_BUFSIZE (TUD_OPT_HIGH_SPEED ? 512 : 64)
 
-#define CFG_TUD_AUDIO_FUNC_1_DESC_LEN TUD_AUDIO_HEADSET_STEREO_DESC_LEN
+#define CFG_TUD_AUDIO_FUNC_1_DESC_LEN TUD_AUDIO_DEVICE_STEREO_DESC_LEN
 
 // How many formats are used, need to adjust USB descriptor if changed
 #define CFG_TUD_AUDIO_FUNC_1_N_FORMATS 1
@@ -318,7 +318,7 @@ extern "C"
     TUD_AUDIO_EP_SIZE(CFG_TUD_AUDIO_FUNC_1_MAX_SAMPLE_RATE,                \
                       CFG_TUD_AUDIO_FUNC_1_FORMAT_1_N_BYTES_PER_SAMPLE_RX, \
                       CFG_TUD_AUDIO_FUNC_1_N_CHANNELS_RX)
-/**
+    /**
 #define CFG_TUD_AUDIO_UNC_1_FORMAT_2_EP_SZ_OUT                             \
     TUD_AUDIO_EP_SIZE(CFG_TUD_AUDIO_FUNC_1_MAX_SAMPLE_RATE,                \
                       CFG_TUD_AUDIO_FUNC_1_FORMAT_2_N_BYTES_PER_SAMPLE_RX, \
