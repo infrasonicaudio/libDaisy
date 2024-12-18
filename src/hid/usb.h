@@ -69,13 +69,6 @@ class UsbHandle
      */
     void SetReceiveCallback(ReceiveCallback cb, UsbPeriph dev);
 
-    /** Calls the underlying dispatching task
-     *  Without an RTOS the tinyusb middleware
-     *  requires that this function be called regularly as all
-     *  callbacks are dispatched from within.
-     */
-    static void RunTask();
-
   private:
 };
 

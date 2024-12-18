@@ -181,11 +181,6 @@ void UsbHandle::SetReceiveCallback(ReceiveCallback cb, UsbPeriph dev)
     }
 }
 
-void UsbHandle::RunTask()
-{
-    tud_task();
-}
-
 // Static Function Implementation
 static void UsbErrorHandler()
 {
@@ -210,5 +205,7 @@ extern "C"
     void OTG_FS_IRQHandler(void)
     {
         tusb_int_handler(0, true);
+        // Set pending service flag so PendSV_Handler is called
+        SCB->ICSR = SCB_ICSR_PENDSVSET_Msk;
     }
 }
