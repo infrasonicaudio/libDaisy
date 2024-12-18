@@ -527,11 +527,11 @@ void System::ConfigureClocks()
     // PeriphClkInitStruct.PLL3.PLL3FRACN     = 0; /**< OLD 48014 values */
     // PeriphClkInitStruct.PLL3.PLL3P         = 16; // 49.xMhz
 
-    // PeriphClkInitStruct.PLL3.PLL3M         = 6;
-    // PeriphClkInitStruct.PLL3.PLL3N         = 294; /**< new values */
-    // // PeriphClkInitStruct.PLL3.PLL3FRACN     = 7472; /**< new values */
+    PeriphClkInitStruct.PLL3.PLL3M         = 6;
+    PeriphClkInitStruct.PLL3.PLL3N         = 294; /**< new values */
+    PeriphClkInitStruct.PLL3.PLL3FRACN     = 7472; /**< new values */
     //  PeriphClkInitStruct.PLL3.PLL3FRACN     = 7471; /**< new values */
-    // PeriphClkInitStruct.PLL3.PLL3P         = 64; // 49.xMhz
+    PeriphClkInitStruct.PLL3.PLL3P         = 64; // 49.xMhz
 
     // PeriphClkInitStruct.PLL3.PLL3M         = 8;
     // PeriphClkInitStruct.PLL3.PLL3N         = 393; /**< new values */
@@ -540,12 +540,12 @@ void System::ConfigureClocks()
     // PeriphClkInitStruct.PLL3.PLL3P         = 8; // 93.304016Mhz
     // // PeriphClkInitStruct.PLL3.PLL3P         = 16; // 49.152008MHz
 
-    PeriphClkInitStruct.PLL3.PLL3M = 15;
-    PeriphClkInitStruct.PLL3.PLL3N = 368; /**< new values */
-    // PeriphClkInitStruct.PLL3.PLL3FRACN     = 7472; /**< new values */
-    PeriphClkInitStruct.PLL3.PLL3FRACN = 5243; /**< new values */
-    PeriphClkInitStruct.PLL3.PLL3P     = 16;   // 24.576001
-    // PeriphClkInitStruct.PLL3.PLL3P         = 16; // 49.152008MHz
+    // PeriphClkInitStruct.PLL3.PLL3M = 15;
+    // PeriphClkInitStruct.PLL3.PLL3N = 368; /**< new values */
+    // // PeriphClkInitStruct.PLL3.PLL3FRACN     = 7472; /**< new values */
+    // PeriphClkInitStruct.PLL3.PLL3FRACN = 5243; /**< new values */
+    // PeriphClkInitStruct.PLL3.PLL3P     = 16;   // 24.576001
+    // // PeriphClkInitStruct.PLL3.PLL3P         = 16; // 49.152008MHz
 
     PeriphClkInitStruct.PLL3.PLL3Q         = 4;
     PeriphClkInitStruct.PLL3.PLL3R         = 32; // 24.xMhz

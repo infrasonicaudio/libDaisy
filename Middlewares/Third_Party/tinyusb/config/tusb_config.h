@@ -306,7 +306,7 @@ extern "C"
 
 #define CFG_TUD_AUDIO_FUNC_1_EP_IN_SW_BUF_SZ       \
     TU_MAX(CFG_TUD_AUDIO_FUNC_1_FORMAT_1_EP_SZ_IN, \
-           CFG_TUD_AUDIO_FUNC_1_FORMAT_1_EP_SZ_IN)
+           CFG_TUD_AUDIO_FUNC_1_FORMAT_1_EP_SZ_IN) * 2
 #define CFG_TUD_AUDIO_FUNC_1_EP_IN_SZ_MAX       \
     TU_MAX(                                     \
         CFG_TUD_AUDIO_FUNC_1_FORMAT_1_EP_SZ_IN, \
@@ -328,7 +328,7 @@ extern "C"
 
 #define CFG_TUD_AUDIO_FUNC_1_EP_OUT_SW_BUF_SZ      \
     TU_MAX(CFG_TUD_AUDIO_UNC_1_FORMAT_1_EP_SZ_OUT, \
-           CFG_TUD_AUDIO_UNC_1_FORMAT_1_EP_SZ_OUT)
+           CFG_TUD_AUDIO_UNC_1_FORMAT_1_EP_SZ_OUT) * 2
 #define CFG_TUD_AUDIO_FUNC_1_EP_OUT_SZ_MAX      \
     TU_MAX(                                     \
         CFG_TUD_AUDIO_UNC_1_FORMAT_1_EP_SZ_OUT, \
