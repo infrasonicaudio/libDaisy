@@ -1,5 +1,5 @@
 #include "system.h"
-#include "usbd_cdc.h"
+// #include "usbd_cdc.h"
 #include "usbh_midi.h"
 #include "hid/usb_midi.h"
 #include <cassert>
@@ -26,6 +26,8 @@ class MidiUsbTransport::Impl
         parse_callback_ = callback;
         parse_context_  = context;
     }
+
+    void Receive();
 
     bool RxActive() { return rx_active_; }
     void FlushRx() { rx_buffer_.Flush(); }
@@ -115,16 +117,41 @@ void MidiUsbTransport::Impl::Init(Config config)
     else
     {
         // This tells the USB middleware to send out MIDI descriptors instead of CDC
-        usbd_mode = USBD_MODE_MIDI;
+        // usbd_mode = USBD_MODE_MIDI;
 
         UsbHandle::UsbPeriph periph = UsbHandle::FS_INTERNAL;
         if(config_.periph == Config::EXTERNAL)
             periph = UsbHandle::FS_EXTERNAL;
 
         usb_handle_.Init(periph);
-
         System::Delay(10);
         usb_handle_.SetReceiveCallback(ReceiveCallback, periph);
+    }
+}
+
+void MidiUsbTransport::Impl::Receive()
+{
+    // USB MIDI packets are always 4 bytes-
+    // Interpret the code index for the number of bytes
+    // to relay to parse callback
+    // while(tusb_midi)
+    uint8_t packet[4];
+    while(tud_midi_available())
+    {
+        // Always read packets, only parse if active
+        // There is only one cable in current descriptors config
+        if(tud_midi_packet_read(packet))
+        {
+            if(!rx_active_ || parse_callback_ == nullptr)
+                continue;
+
+            const uint8_t cidx = packet[0];
+            if(cidx == 0x00 || cidx == 0x01)
+                continue;
+
+            const uint8_t size = code_index_size_[cidx];
+            parse_callback_(&packet[1], size, parse_context_);
+        }
     }
 }
 
@@ -135,6 +162,7 @@ void MidiUsbTransport::Impl::Tx(uint8_t* buffer, size_t size)
     if(config_.periph == Config::HOST)
     {
         MIDI_ErrorTypeDef result;
+        MidiToUsb(buffer, size);
         result = USBH_MIDI_Transmit(pUSB_Host, tx_buffer_, tx_ptr_);
         // should_retry = (result == MIDI_BUSY) && attempt_count--;
     }
@@ -338,6 +366,11 @@ bool MidiUsbTransport::RxActive()
 void MidiUsbTransport::FlushRx()
 {
     pimpl_->FlushRx();
+}
+
+void MidiUsbTransport::Receive()
+{
+    pimpl_->Receive();
 }
 
 void MidiUsbTransport::Tx(uint8_t* buffer, size_t size)

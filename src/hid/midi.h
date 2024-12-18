@@ -17,6 +17,8 @@
 namespace daisy
 {
 
+
+
 /** @brief   Transport layer for sending and receiving MIDI data over UART
  *  @details This is the mode of communication used for TRS and DIN MIDI
  *           There is an additional 2kB of RAM data used within this class
@@ -105,6 +107,9 @@ class MidiUartTransport
 
     /** @brief This is a no-op for UART transport - Rx is via DMA callback with circular buffer */
     inline void FlushRx() {}
+
+    /** No-op for compatibility */
+    inline void Receive() {}
 
 
     /** @brief sends the buffer of bytes out of the UART peripheral */
@@ -212,6 +217,11 @@ class MidiHandler
             transport_.FlushRx();
             StartReceive();
         }
+        // tinyusb doesn't interrupt on new data,
+        // requires constant polling, so we have to
+        // pull packets from the queue. This is a no-op
+        // for UART MIDI transport.
+        transport_.Receive();
     }
 
     /** Checks if there are unhandled messages in the queue

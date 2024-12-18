@@ -35,16 +35,31 @@ but the rest of the tinyusb config lives in libDaisy.
 
 * USB serial Tx now calls through to tinyUSB cdc functions (`tud_cdc_`)
 * Only one of internal (FS) or external (HS) can be used at a time for CDC - not both
+* Logger sync Tx is disabled, does not work with tinyusb
+* Increased tinyusb CDC buffer sizes to 128 to match Logger
 
 ### TODOs
 
 - [ ] Figure out if there's a way to setup CDC on both interfaces (int/ext aka FS/HS)
 - [ ] Rx callbacks in USBHandler probably don't work anymore, need to fix/adapt for tinyusb
 - [ ] BUG: sync start (wait for pc) of USB loggers doesn't work anymore
+- [ ] BUG: Funky behavior with tx overflow with lots of prints in between calls to tud_task().
+      Messages get clipped and then repeat.
 
 ## USB MIDI
 
-TODO
+### Changes
+
+- USB MIDI transport now uses TinyUSB instead of ST middleware
+- Add `Receive()` method to MIDI transport implementations in lieu of Rx callback support in tinyusb
+* Increased tinyusb MIDI buffer sizes to 128
+
+### TODOs
+
+- [ ] Figure out if there's a way to setup MIDI on both interfaces (int/ext aka FS/HS)
+- [ ] Reimplement USB Host MIDI using tinyusb
+- [ ] Add support for multiple "cables" (maybe?)
+- [ ] BUG: Tx retry count doesn't do anything anymore, reimplement if necessary or just remove
 
 ## USB Audio
 
