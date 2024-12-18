@@ -55,7 +55,7 @@ extern "C"
             AUDIO_CS_AS_INTERFACE_CTRL_LATENCY_POS), /* Clock Source Descriptor(4.7.2.1) */                                       \
         TUD_AUDIO_DESC_CLK_SRC(                                                                                                   \
             /*_clkid*/ UAC2_ENTITY_CLOCK,                                                                                         \
-            /*_attr - changed to fixed clock*/ 1,                                                                                 \
+            /*_attr */ 3,                                                                                 \
             /*_ctrl*/ 7,                                                                                                          \
             /*_assocTerm*/ 0x00,                                                                                                  \
             /*_stridx*/ 0x00), /* Input Terminal Descriptor(4.7.2.4) */                                                           \
