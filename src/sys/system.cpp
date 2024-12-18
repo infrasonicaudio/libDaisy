@@ -23,8 +23,8 @@ extern "C"
 }
 
 // boot info struct declared in persistent backup SRAM
-volatile daisy::System::BootInfo __attribute__((section(".backup_sram")))
-daisy::boot_info;
+volatile daisy::System::BootInfo
+    __attribute__((section(".backup_sram"))) daisy::boot_info;
 
 // Jump related stuff
 #define u32 uint32_t
@@ -126,7 +126,7 @@ extern "C"
         //     HAL_HCD_IRQHandler(&hhcd_USB_OTG_HS);
         // if(hpcd_USB_OTG_HS.Instance)
         //     HAL_PCD_IRQHandler(&hpcd_USB_OTG_HS);
-        tud_int_handler(BOARD_TUD_RHPORT);
+        tusb_int_handler(1, true);
     }
 
     // TODO: Add some real handling to the HardFaultHandler
@@ -527,11 +527,11 @@ void System::ConfigureClocks()
     // PeriphClkInitStruct.PLL3.PLL3P         = 8; // 93.304016Mhz
     // // PeriphClkInitStruct.PLL3.PLL3P         = 16; // 49.152008MHz
 
-    PeriphClkInitStruct.PLL3.PLL3M         = 15;
-    PeriphClkInitStruct.PLL3.PLL3N         = 368; /**< new values */
+    PeriphClkInitStruct.PLL3.PLL3M = 15;
+    PeriphClkInitStruct.PLL3.PLL3N = 368; /**< new values */
     // PeriphClkInitStruct.PLL3.PLL3FRACN     = 7472; /**< new values */
-     PeriphClkInitStruct.PLL3.PLL3FRACN     = 5243; /**< new values */
-    PeriphClkInitStruct.PLL3.PLL3P         = 16; // 24.576001
+    PeriphClkInitStruct.PLL3.PLL3FRACN = 5243; /**< new values */
+    PeriphClkInitStruct.PLL3.PLL3P     = 16;   // 24.576001
     // PeriphClkInitStruct.PLL3.PLL3P         = 16; // 49.152008MHz
 
     PeriphClkInitStruct.PLL3.PLL3Q         = 4;

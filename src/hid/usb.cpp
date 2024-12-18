@@ -44,7 +44,9 @@ static void InitFS()
         {
             UsbErrorHandler();
         }
-        tud_init(0);
+        tusb_rhport_init_t dev_init
+            = {.role = TUSB_ROLE_DEVICE, .speed = TUSB_SPEED_AUTO};
+        tusb_init(0, &dev_init);
     }
     // if(USBD_RegisterClass(&hUsbDeviceFS, &USBD_CDC) != USBD_OK)
     // {
@@ -85,7 +87,9 @@ static void InitHS()
         {
             UsbErrorHandler();
         }
-        tud_init(1);
+        tusb_rhport_init_t dev_init
+            = {.role = TUSB_ROLE_DEVICE, .speed = TUSB_SPEED_AUTO};
+        tusb_init(1, &dev_init);
     }
 
     // if(USBD_RegisterClass(&hUsbDeviceHS, &USBD_CDC) != USBD_OK)
@@ -205,6 +209,6 @@ extern "C"
 
     void OTG_FS_IRQHandler(void)
     {
-        tud_int_handler(BOARD_TUD_RHPORT);
+        tusb_int_handler(0, true);
     }
 }

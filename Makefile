@@ -224,7 +224,7 @@ $(wildcard Middlewares/Third_Party/tinyusb/src/*.c) \
 $(wildcard Middlewares/Third_Party/tinyusb/src/class/*/*.c) \
 $(wildcard Middlewares/Third_Party/tinyusb/src/common/*.c) \
 $(wildcard Middlewares/Third_Party/tinyusb/src/device/*.c) \
-Middlewares/Third_Party/tinyusb/src/portable/synopsys/dwc2/dcd_dwc2.c \
+$(wildcard Middlewares/Third_Party/tinyusb/src/portable/synopsys/dwc2/*.c) \
 Middlewares/ST/STM32_USB_Host_Library/Class/MSC/Src/usbh_msc_bot.c \
 Middlewares/ST/STM32_USB_Host_Library/Class/MSC/Src/usbh_msc_scsi.c \
 Middlewares/ST/STM32_USB_Host_Library/Class/MSC/Src/usbh_msc.c \
