@@ -21,7 +21,6 @@ but the rest of the tinyusb config lives in libDaisy.
 
 ### TODOs
 
-- [ ] Adopt latest TinyUSB to allow both USB OTG peripherals to operate simultaneously
 - [ ] Stop using ST USBD middleware
 - [ ] Change USB host support to use tinyusb
 - [ ] Move USB HS HAL callbacks out of system.cpp and into usb.cpp
@@ -36,7 +35,7 @@ but the rest of the tinyusb config lives in libDaisy.
 * USB serial Tx now calls through to tinyUSB cdc functions (`tud_cdc_`)
 * Only one of internal (FS) or external (HS) can be used at a time for CDC - not both
 * Logger sync Tx is disabled, does not work with tinyusb
-* Increased tinyusb CDC buffer sizes to 128 to match Logger
+* Increased tinyusb CDC buffer sizes to >= 128 to match Logger
 
 ### TODOs
 
@@ -51,8 +50,8 @@ but the rest of the tinyusb config lives in libDaisy.
 ### Changes
 
 - USB MIDI transport now uses TinyUSB instead of ST middleware
-- Add `Receive()` method to MIDI transport implementations in lieu of Rx callback support in tinyusb
-* Increased tinyusb MIDI buffer sizes to 128
+- Implemnt tud_midi_rx_cb() to handle new data
+- Increased tinyusb MIDI buffer sizes to 128
 
 ### TODOs
 
@@ -75,10 +74,17 @@ Currently, UAC2 descriptor macros (in libDaisy file `tusb_config.h`) contain a
 ton of hardcoded stuff - maybe this is fine, but should probably be user-configurable
 to some degree.
 
+There are still occasional dropped packets on receiving a stream from the host.
+
 ### Changes
 
 * SAI max buffer size increased to 4096
 * DMA non-cached RAM2 region increased to 128kB in linker script
+* DMA IRQn priorities all lowered to 1 (to accommodate USB IRQn to supersede)
+* RCC for PLL3 changed to get closer to 48kHz true SAI sample rate
+* Call `tud_task()` from `PendSV_Handler()` - triggered on USB interrupts and systick (1ms)
+    * This ensures the task is processed low-priority, and as soon as possible after USB ISR
+    * Also avoids conflict with any longer-running main loop tasks
 
 ### TODOs
 

@@ -50,7 +50,6 @@ class MidiUsbTransport
     bool RxActive();
     void FlushRx();
     void Tx(uint8_t* buffer, size_t size);
-    void Receive();
 
     class Impl;
 

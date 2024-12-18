@@ -304,6 +304,7 @@ extern "C"
                       CFG_TUD_AUDIO_FUNC_1_N_CHANNELS_TX)
 */
 
+// tinyusb FIFOs 4x larger than necessary - helps avoid cb sync errors
 #define CFG_TUD_AUDIO_FUNC_1_EP_IN_SW_BUF_SZ       \
     TU_MAX(CFG_TUD_AUDIO_FUNC_1_FORMAT_1_EP_SZ_IN, \
            CFG_TUD_AUDIO_FUNC_1_FORMAT_1_EP_SZ_IN) * 4

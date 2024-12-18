@@ -27,7 +27,6 @@ class MidiUsbTransport::Impl
         parse_context_  = context;
     }
 
-    void Receive();
 
     bool RxActive() { return rx_active_; }
     void FlushRx() { rx_buffer_.Flush(); }
@@ -36,6 +35,9 @@ class MidiUsbTransport::Impl
     void UsbToMidi(uint8_t* buffer, uint8_t length);
     void MidiToUsb(uint8_t* buffer, size_t length);
     void Parse();
+
+    // For tusb
+    void receive();
 
   private:
     void MidiToUsbSingle(uint8_t* buffer, size_t length);
@@ -77,6 +79,14 @@ class MidiUsbTransport::Impl
 
 // Global Impl
 static MidiUsbTransport::Impl midi_usb_handle;
+
+extern "C"
+{
+    void tud_midi_rx_cb(uint8_t itf)
+    {
+        midi_usb_handle.receive();
+    }
+}
 
 void ReceiveCallback(uint8_t* buffer, uint32_t* length)
 {
@@ -129,7 +139,7 @@ void MidiUsbTransport::Impl::Init(Config config)
     }
 }
 
-void MidiUsbTransport::Impl::Receive()
+void MidiUsbTransport::Impl::receive()
 {
     // USB MIDI packets are always 4 bytes-
     // Interpret the code index for the number of bytes
@@ -366,11 +376,6 @@ bool MidiUsbTransport::RxActive()
 void MidiUsbTransport::FlushRx()
 {
     pimpl_->FlushRx();
-}
-
-void MidiUsbTransport::Receive()
-{
-    pimpl_->Receive();
 }
 
 void MidiUsbTransport::Tx(uint8_t* buffer, size_t size)
