@@ -24,7 +24,6 @@ extern "C"
 #define BOARD_TUD_MAX_SPEED OPT_MODE_FULL_SPEED
 #endif
 
-#define CFG_QUIRK_OS_GUESSING   1
 
 //--------------------------------------------------------------------
 // COMMON CONFIGURATION
@@ -101,6 +100,7 @@ extern "C"
     TUD_AUDIO_EP_SIZE(CFG_TUD_AUDIO_FUNC_1_MAX_SAMPLE_RATE,       \
                       CFG_TUD_AUDIO_FUNC_1_N_BYTES_PER_SAMPLE_RX, \
                       CFG_TUD_AUDIO_FUNC_1_N_CHANNELS_RX)
+
 #define CFG_TUD_AUDIO_FUNC_1_EP_OUT_SW_BUF_SZ \
          CFG_TUD_AUDIO_FUNC_1_EP_OUT_SZ_MAX * 8
 
