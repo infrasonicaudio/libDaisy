@@ -10,6 +10,17 @@ MidiTxMessage::MidiTxMessage()
     std::fill(data, data + kMaxDataSize, 0);
 }
 
+MidiTxMessage::MidiTxMessage(const uint8_t* data, size_t size)
+{
+    if (size > kMaxDataSize)
+    {
+        *this = MidiTxMessage();
+        return;
+    }
+    std::copy(data, data + size, this->data);
+    this->size = size;
+}
+
 MidiTxMessage MidiTxMessage::NoteOn(uint8_t ch, uint8_t nn, uint8_t vel)
 {
     MidiTxMessage msg;

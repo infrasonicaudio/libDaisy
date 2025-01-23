@@ -164,6 +164,8 @@ template <typename Transport,
 class MidiHandler
 {
   public:
+    typedef void (*RawDataCallback)(const uint8_t* data, size_t size);
+
     MidiHandler() {}
     ~MidiHandler() {}
 
@@ -182,7 +184,12 @@ class MidiHandler
         transport_.Init(config_.transport_config);
         tx_buffer_.Init(config_.running_status_enabled);
         parser_.Init();
+        raw_cb_ = nullptr;
     }
+
+    /** Sets a callback to be invoked whenever transport receives
+     *  raw data, to handle raw bytes independent of parser/FIFO */
+    void SetRawDataCallback(RawDataCallback cb) { raw_cb_ = cb; }
 
     /** Starts listening on the selected input mode(s).
      * MidiEvent Queue will begin to fill, and can be checked with HasEvents() */
@@ -265,6 +272,8 @@ class MidiHandler
     Transport  transport_;
     MidiParser parser_;
 
+    RawDataCallback raw_cb_;
+
     FIFO<MidiEvent, KRxEventQueueSize>          rx_event_q_;
     FIFO<MidiTxMessage, kTxMessageQueueSize>    tx_msg_q_;
     FIFO<MidiTxMessage, kTxISRMessageQueueSize> tx_msg_q_isr_;
@@ -273,6 +282,10 @@ class MidiHandler
     static void ParseCallback(uint8_t* data, size_t size, void* context)
     {
         MidiHandler* handler = reinterpret_cast<MidiHandler*>(context);
+        if (handler->raw_cb_ != nullptr)
+        {
+            handler->raw_cb_(data, size);
+        }
         for(size_t i = 0; i < size; i++)
         {
             handler->Parse(data[i]);
