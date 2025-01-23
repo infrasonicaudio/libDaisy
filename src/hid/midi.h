@@ -18,7 +18,6 @@ namespace daisy
 {
 
 
-
 /** @brief   Transport layer for sending and receiving MIDI data over UART
  *  @details This is the mode of communication used for TRS and DIN MIDI
  *           There is an additional 2kB of RAM data used within this class
@@ -165,6 +164,8 @@ template <typename Transport,
 class MidiHandler
 {
   public:
+    typedef void (*RawDataCallback)(const uint8_t* data, size_t size);
+
     MidiHandler() {}
     ~MidiHandler() {}
 
@@ -183,22 +184,18 @@ class MidiHandler
         transport_.Init(config_.transport_config);
         tx_buffer_.Init(config_.running_status_enabled);
         parser_.Init();
+        raw_cb_ = nullptr;
     }
+
+    /** Sets a callback to be invoked whenever transport receives
+     *  raw data, to handle raw bytes independent of parser/FIFO */
+    void SetRawDataCallback(RawDataCallback cb) { raw_cb_ = cb; }
 
     /** Starts listening on the selected input mode(s).
      * MidiEvent Queue will begin to fill, and can be checked with HasEvents() */
     void StartReceive()
     {
         transport_.StartRx(MidiHandler::ParseCallback, this);
-    }
-
-    /** Starts listening, but uses a custom callback of the users design.
-     *  This callback is responsible for either calling the public parse function,
-     *  or forwarding the raw bytes to some other system.
-     */
-    void StartReceiveWithCallback(MidiUartTransport::MidiRxParseCallback cb)
-    {
-        transport_.StartRx(cb, this);
     }
 
     /** Start listening */
@@ -275,6 +272,8 @@ class MidiHandler
     Transport  transport_;
     MidiParser parser_;
 
+    RawDataCallback raw_cb_;
+
     FIFO<MidiEvent, KRxEventQueueSize>          rx_event_q_;
     FIFO<MidiTxMessage, kTxMessageQueueSize>    tx_msg_q_;
     FIFO<MidiTxMessage, kTxISRMessageQueueSize> tx_msg_q_isr_;
@@ -283,6 +282,10 @@ class MidiHandler
     static void ParseCallback(uint8_t* data, size_t size, void* context)
     {
         MidiHandler* handler = reinterpret_cast<MidiHandler*>(context);
+        if (handler->raw_cb_ != nullptr)
+        {
+            handler->raw_cb_(data, size);
+        }
         for(size_t i = 0; i < size; i++)
         {
             handler->Parse(data[i]);

@@ -15,6 +15,7 @@ struct MidiTxMessage
     size_t  size;
 
     MidiTxMessage();
+    MidiTxMessage(const uint8_t* data, size_t size);
     ~MidiTxMessage() = default;
 
     static MidiTxMessage NoteOn(uint8_t ch, uint8_t nn, uint8_t vel);
