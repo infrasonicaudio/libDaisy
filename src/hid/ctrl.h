@@ -43,7 +43,7 @@ class AnalogControl
     \param sr Audio engine sample rate
     \param flip determines whether the input is flipped (i.e. 1.f - input) or not after being processed. (default false)
     */
-    void InitBipolarCv(uint16_t *adcptr, float sr, bool flip = false);
+    void InitBipolarCv(uint16_t *adcptr, float sr, bool flip = false, float slew_seconds = 0.002f);
 
     /**
     Filters, and transforms a raw ADC read into a normalized range.

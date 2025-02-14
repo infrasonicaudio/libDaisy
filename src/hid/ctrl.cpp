@@ -22,12 +22,12 @@ void AnalogControl::Init(uint16_t *adcptr,
     slew_seconds_ = slew_seconds;
 }
 
-void AnalogControl::InitBipolarCv(uint16_t *adcptr, float sr, bool flip)
+void AnalogControl::InitBipolarCv(uint16_t *adcptr, float sr, bool flip, float slew_seconds)
 {
     val_        = 0.0f;
     raw_        = adcptr;
     samplerate_ = sr;
-    SetCoeff(1.0f / (0.002f * samplerate_ * 0.5f));
+    SetCoeff(1.0f / (slew_seconds * samplerate_ * 0.5f));
     scale_      = 2.0f;
     offset_     = 0.5f;
     flip_       = flip;
