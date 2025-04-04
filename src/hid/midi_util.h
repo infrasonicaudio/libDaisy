@@ -19,6 +19,7 @@ struct MidiTxMessage
 
     static MidiTxMessage NoteOn(uint8_t ch, uint8_t nn, uint8_t vel);
     static MidiTxMessage NoteOff(uint8_t ch, uint8_t nn, uint8_t vel);
+    static MidiTxMessage ControlChange(uint8_t ch, uint8_t ctl, uint8_t val);
     static MidiTxMessage PitchBend(uint8_t ch, int16_t bend);
     static MidiTxMessage SystemRealtimeClock();
     static MidiTxMessage SystemRealtimeStart();

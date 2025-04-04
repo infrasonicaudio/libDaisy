@@ -36,6 +36,19 @@ MidiTxMessage MidiTxMessage::NoteOff(uint8_t ch, uint8_t nn, uint8_t vel)
     return msg;
 }
 
+MidiTxMessage MidiTxMessage::ControlChange(uint8_t ch, uint8_t ctl, uint8_t val)
+{
+    MidiTxMessage msg;
+    msg.size = 3;
+    // status byte
+    msg.data[0] = 0xB0 | (ch & 0x0F);
+    // note num
+    msg.data[1] = ctl & 0x7F;
+    // velocity
+    msg.data[2] = val & 0x7F;
+    return msg;
+}
+
 MidiTxMessage MidiTxMessage::PitchBend(uint8_t ch, int16_t bend)
 {
     MidiTxMessage msg;
