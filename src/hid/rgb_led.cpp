@@ -1,10 +1,10 @@
 #include "hid/rgb_led.h"
 using namespace daisy;
-void RgbLed::Init(Pin red, Pin green, Pin blue, bool invert)
+void RgbLed::Init(Pin red, Pin green, Pin blue, bool invert, float samplerate)
 {
-    r_.Init(red, invert);
-    g_.Init(green, invert);
-    b_.Init(blue, invert);
+    r_.Init(red, invert, samplerate);
+    g_.Init(green, invert, samplerate);
+    b_.Init(blue, invert, samplerate);
 }
 
 void RgbLed::Set(float r, float g, float b)

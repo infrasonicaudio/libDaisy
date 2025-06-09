@@ -23,9 +23,9 @@ class RgbLed
     \param blue Blue element
     \param invert Flips led polarity
     */
-    void Init(Pin red, Pin green, Pin blue, bool invert);
+    void Init(Pin red, Pin green, Pin blue, bool invert, float samplerate = 1000.f);
 
-    /** Sets each element of the LED with a floating point number 0-1 
+    /** Sets each element of the LED with a floating point number 0-1
     \param r Red element
     \param g Green element
     \param b Blue element
