@@ -47,7 +47,7 @@ var NAVTREE =
       [ "Hello World", "md_doc_2md_2__a2___getting-_started-_serial-_printing.html#autotoc_md14", null ],
       [ "String Formatting", "md_doc_2md_2__a2___getting-_started-_serial-_printing.html#autotoc_md15", null ],
       [ "Floating Point Numbers", "md_doc_2md_2__a2___getting-_started-_serial-_printing.html#autotoc_md16", [
-        [ "Using %f specifier", "md_doc_2md_2__a2___getting-_started-_serial-_printing.html#autotoc_md17", null ],
+        [ "Using f specifier", "md_doc_2md_2__a2___getting-_started-_serial-_printing.html#autotoc_md17", null ],
         [ "Using FLT_FMT and FLT_VAR macros", "md_doc_2md_2__a2___getting-_started-_serial-_printing.html#autotoc_md18", null ],
         [ "Using FixedCapStr class", "md_doc_2md_2__a2___getting-_started-_serial-_printing.html#autotoc_md19", null ]
       ] ],
@@ -152,13 +152,13 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "_abstract_menu_8h.html",
-"classdaisy_1_1_fat_f_s_interface.html#a1ccb7d6bbc2cbf61026b5ce374017b7c",
-"classdaisy_1_1_s_h1106_driver.html",
-"daisy__core_8h.html#a0f3f80696b55547e8471a18de01b8e13a51da6674fae3df8f696481f783f5668e",
-"functions_func_n.html",
-"mcp23x17_8h.html#a4d0fda25eb2fa3a27bec48dc5871486b",
-"sr__4021_8h_source.html",
-"usb__midi_8h.html#a271533fd70083fec8006daa385671553"
+"classdaisy_1_1_fat_f_s_interface.html#a350b62c286a29e6e24d6c0470eb12089",
+"classdaisy_1_1_rectangle.html#a720b025496622ccbe36b5d218d4f8205",
+"classes.html",
+"functions_eval_i.html",
+"max11300_8h.html#aa2604bd1a07178f2a22f9edf829f4c47a59136a8606208d070ab08a0639032f72",
+"qspi_8h_source.html",
+"structdaisy_1_1_wm8731_1_1_config.html#af7820bfc598cc2123e9d91eb740e965a"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';
