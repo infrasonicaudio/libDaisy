@@ -221,6 +221,11 @@ Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_ioreq.c \
 Middlewares/Third_Party/FatFs/src/diskio.c \
 Middlewares/Third_Party/FatFs/src/ff.c \
 Middlewares/Third_Party/FatFs/src/ff_gen_drv.c  \
+$(wildcard Middlewares/Third_Party/tinyusb/src/*.c) \
+$(wildcard Middlewares/Third_Party/tinyusb/src/class/*/*.c) \
+$(wildcard Middlewares/Third_Party/tinyusb/src/common/*.c) \
+$(wildcard Middlewares/Third_Party/tinyusb/src/device/*.c) \
+$(wildcard Middlewares/Third_Party/tinyusb/src/portable/synopsys/dwc2/*.c) \
 Middlewares/ST/STM32_USB_Host_Library/Class/MSC/Src/usbh_msc_bot.c \
 Middlewares/ST/STM32_USB_Host_Library/Class/MSC/Src/usbh_msc_scsi.c \
 Middlewares/ST/STM32_USB_Host_Library/Class/MSC/Src/usbh_msc.c \
@@ -297,7 +302,8 @@ C_DEFS =  \
 -DHSE_VALUE=16000000 \
 -DUSE_HAL_DRIVER \
 -DUSE_FULL_LL_DRIVER \
--DDATA_IN_D2_SRAM
+-DDATA_IN_D2_SRAM \
+-DDSY_USE_UART
 # ^ added for easy startup access
 
 C_INCLUDES = \
@@ -315,6 +321,8 @@ C_INCLUDES = \
 -IMiddlewares/ST/STM32_USB_Host_Library/Class/MSC/Inc \
 -IMiddlewares/ST/STM32_USB_Host_Library/Class/MIDI/Inc \
 -IMiddlewares/Third_Party/FatFs/src \
+-IMiddlewares/Third_Party/tinyusb/config \
+-IMiddlewares/Third_Party/tinyusb/src \
 -I$(MODULE_DIR) \
 -I.
 

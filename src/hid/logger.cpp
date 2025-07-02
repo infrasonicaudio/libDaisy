@@ -71,16 +71,20 @@ void Logger<dest>::TransmitBuf()
         tx_ptr_ = sizeof(tx_buff_);
     }
 
-    if(pc_sync_ >= LOGGER_SYNC_IN)
-    {
-        TransmitSync(tx_buff_, tx_ptr_);
-        tx_ptr_ = 0;
-    }
-    else
+    // TODO: Synchronous transmission does NOT work with tinyusb logging
+    // because tud_task() is not really meant to be called from ISR and
+    // so the synchronous while loop just locks everything up
+
+    // if(pc_sync_ >= LOGGER_SYNC_IN)
+    // {
+    //     TransmitSync(tx_buff_, tx_ptr_);
+    //     tx_ptr_ = 0;
+    // }
+    // else
     {
         if(true == impl_.Transmit(tx_buff_, tx_ptr_))
         {
-            pc_sync_++;
+            // pc_sync_++;
             tx_ptr_ = 0;
         }
         /** otherwise do not reset tx_ptr_
